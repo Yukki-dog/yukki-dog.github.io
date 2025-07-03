@@ -5,21 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Yukki — самая милая чихуахуа</title>
 <style>
-  /* Сброс и базовые стили */
   body {
     margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #ffe4e1; /* нежно-розовый фон по умолчанию */
+    background: #ffe4e1;
     color: #333;
-    transition: background 0.5s, color 0.5s;
-  }
-  h1, h2 {
-    margin: 0.5em 0;
-    font-weight: 700;
+    transition: background 0.3s, color 0.3s;
   }
   #container {
-    max-width: 960px;
-    margin: auto;
-    padding: 1rem;
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem;
     text-align: center;
   }
   #title {
@@ -28,78 +23,77 @@
     user-select: none;
   }
   #greeting {
-    font-size: 1.4rem;
-    margin-bottom: 1em;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
   }
   #yukkiAvatar {
-    width: 200px;
+    width: 180px;
     border-radius: 50%;
     cursor: pointer;
-    border: 5px solid #fff;
-    box-shadow: 0 0 15px rgba(255, 192, 203, 0.6);
+    border: 4px solid #fff;
+    box-shadow: 0 0 12px rgba(255, 105, 180, 0.7);
     transition: transform 0.3s ease;
-    margin-bottom: 1em;
+    margin-bottom: 1rem;
   }
   #yukkiAvatar:hover {
-    transform: scale(1.05) rotate(5deg);
+    transform: scale(1.05) rotate(4deg);
   }
   .photos {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 2em;
+    gap: 12px;
+    margin-bottom: 2rem;
   }
   .photo-item {
-    flex: 1 1 150px;
-    max-width: 180px;
+    flex: 1 1 140px;
+    max-width: 160px;
     cursor: pointer;
   }
   .photo-item img {
     width: 100%;
-    border-radius: 15px;
-    transition: transform 0.5s ease;
+    border-radius: 12px;
+    transition: transform 0.4s ease;
   }
   .photo-item img:hover {
     transform: scale(1.1) rotate(5deg);
   }
   .caption {
-    font-size: 0.9rem;
-    margin-top: 0.3em;
+    font-size: 0.85rem;
+    margin-top: 0.25em;
     color: #555;
   }
   #factsBox {
     position: fixed;
-    bottom: 10px;
-    left: 10px;
+    bottom: 12px;
+    left: 12px;
     max-width: 280px;
-    padding: 0.6em 1em;
-    background: rgba(255 255 255 / 0.8);
-    border-radius: 10px;
+    padding: 10px 15px;
+    background: rgba(255 255 255 / 0.85);
+    border-radius: 12px;
     font-size: 1rem;
-    color: #555;
     font-style: italic;
-    box-shadow: 0 0 10px rgba(255,192,203,0.8);
-    transition: opacity 0.6s ease;
+    color: #555;
+    box-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
+    transition: opacity 0.5s ease;
   }
-  /* Кнопки управления звуком и сменой */
   #controls {
-    margin: 1.5em 0;
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 10px;
     flex-wrap: wrap;
+    margin-bottom: 1rem;
   }
   button {
     background: #ff69b4;
     border: none;
-    border-radius: 25px;
-    padding: 0.6em 1.4em;
+    border-radius: 22px;
+    padding: 8px 16px;
     color: white;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(255,105,180,0.5);
+    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
     transition: background 0.3s ease;
     user-select: none;
   }
@@ -108,32 +102,11 @@
   }
   select {
     font-size: 1rem;
-    padding: 0.4em 0.8em;
+    padding: 6px 10px;
     border-radius: 10px;
     border: 1px solid #ccc;
     cursor: pointer;
   }
-  /* Тема "День" */
-  body.day {
-    background: #fff0f6;
-    color: #333;
-  }
-  /* Тема "Ночь" */
-  body.night {
-    background: #1a1a2e;
-    color: #eee;
-  }
-  body.night #factsBox {
-    background: rgba(30 30 50 / 0.8);
-    color: #ccc;
-    box-shadow: 0 0 12px rgba(100, 100, 150, 0.9);
-  }
-  /* Тема "Розовая" */
-  body.pink {
-    background: #ffd6e8;
-    color: #7a003d;
-  }
-  /* Кнопка "Наверх" */
   #toTopBtn {
     position: fixed;
     right: 20px;
@@ -141,11 +114,11 @@
     background: #ff69b4;
     border: none;
     border-radius: 50%;
-    padding: 0.8em 1em;
-    font-size: 1.5rem;
+    padding: 10px 14px;
+    font-size: 1.4rem;
     color: white;
     cursor: pointer;
-    box-shadow: 0 4px 10px rgba(255,105,180,0.7);
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.7);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
@@ -155,22 +128,15 @@
     opacity: 1;
     pointer-events: auto;
   }
-  /* Аватар и подписи */
-  .photo-caption {
-    margin-top: 0.4em;
-    font-style: italic;
-    font-size: 0.9rem;
-    color: #a83e70;
-  }
 </style>
 </head>
-<body class="day">
+<body>
 
 <div id="container">
   <h1 id="title">Yukki</h1>
   <div id="greeting">Привет! Я Юкки — самая милая чихуахуа! 💖</div>
   <img id="yukkiAvatar" src="cute.jfif" alt="Фото Юкки" title="Кликни для 'гав-гав!'" />
-  
+
   <div class="photos">
     <div class="photo-item">
       <img src="New_year.jfif" alt="Юкки у елки в шапочке эльфа" />
@@ -224,10 +190,10 @@
       <option value="pink">Розовая</option>
     </select>
 
-    <button id="musicToggle" title="Включить/выключить музыку">🔈</button>
+    <button id="musicToggle" title="Включить/выключить музыку">🔊</button>
   </div>
 
-  <button id="toTopBtn" title="Наверх">⬆️</button>
+  <button id="toTopBtn" title="Наверх">↑</button>
 </div>
 
 <!-- Аудио -->
@@ -240,10 +206,6 @@
   const texts = {
     ru: {
       greeting: "Привет! Я Юкки — самая милая чихуахуа! 💖",
-      eyesTail: "У меня карие глаза и пушистый хвост с белой кисточкой на конце.",
-      commandsKnown: "Знаю команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.",
-      learning: "Я очень быстро учусь и люблю гулять в комбезе.",
-      favoriteToy: "Обожаю играть с любимой игрушкой — ёжиком.",
       captions: {
         capNewYear: "Юкки в шапочке эльфа у ёлки",
         capPaw: "Юккина лапка",
@@ -268,10 +230,6 @@
     },
     uk: {
       greeting: "Привіт! Я Юккі — наймиліша чихуахуа! 💖",
-      eyesTail: "У мене карі очі та пухнастий хвіст із білою китичкою на кінці.",
-      commandsKnown: "Знаю команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
-      learning: "Я дуже швидко вчуся і люблю гуляти в комбінезоні.",
-      favoriteToy: "Обожнюю гратися з улюбленою іграшкою — їжачком.",
       captions: {
         capNewYear: "Юккі у шапочці ельфа біля ялинки",
         capPaw: "Юккіна лапка",
@@ -288,104 +246,90 @@
         "Пухнастий хвіст із білою китичкою на кінці.",
         "Знає команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
         "Любить гуляти в комбінезоні.",
-        "Уміє відкривати фантики цукерок, де ховають смаколики.",
+        "Вміє відкривати фантики цукерок, де ховають смаколики.",
         "Дуже розумна і швидко навчається.",
         "Обожнює гратися з улюбленою іграшкою — їжачком.",
         "Іноді сором’язлива, але дуже добра і лагідна."
       ]
     },
     en: {
-      greeting: "Hi! I'm Yukki — the cutest Chihuahua ever! 💖",
-      eyesTail: "I have brown eyes and a fluffy tail with a white tip.",
-      commandsKnown: "I know commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
-      learning: "I learn new tricks very fast and love to walk in my jumpsuit.",
-      favoriteToy: "I love playing with my favorite toy — a hedgehog.",
+      greeting: "Hi! I'm Yukki — the cutest Chihuahua! 💖",
       captions: {
-        capNewYear: "Yukki in an elf hat by the Christmas tree",
+        capNewYear: "Yukki in an elf hat near the Christmas tree",
         capPaw: "Yukki's paw",
-        capSitting: "Sitting very cutely",
-        capWinter: "Standing on two paws in the snow",
-        capCandy: "With candy in her teeth (can open wrappers!)",
-        capGlasses: "In glasses showing Kyiv 💖",
+        capSitting: "Yukki sitting very cutely",
+        capWinter: "Standing on two front paws on snow",
+        capCandy: "With candy in her teeth (can unwrap wrappers!)",
+        capGlasses: "Wearing glasses reflecting Kyiv 💖",
         capHat: "Origami hat",
         capToy: "Best friends forever 🤍"
       },
       facts: [
         "Born on March 1, 2021.",
-        "Has brown eyes.",
+        "She has brown eyes.",
         "Fluffy tail with a white tip.",
         "Knows commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
-        "Loves walking in a jumpsuit.",
-        "Can open candy wrappers where treats are hidden.",
+        "Loves walking in her jumpsuit.",
+        "Can unwrap candy wrappers where treats are hidden.",
         "Very smart and learns quickly.",
         "Loves playing with her favorite toy — a hedgehog.",
-        "Sometimes shy, but very kind and affectionate."
+        "Sometimes shy, but very kind and gentle."
       ]
     }
   };
 
-  // Элементы для смены текста
-  const greetingEl = document.getElementById("greeting");
-  const capNewYear = document.getElementById("capNewYear");
-  const capPaw = document.getElementById("capPaw");
-  const capSitting = document.getElementById("capSitting");
-  const capWinter = document.getElementById("capWinter");
-  const capCandy = document.getElementById("capCandy");
-  const capGlasses = document.getElementById("capGlasses");
-  const capHat = document.getElementById("capHat");
-  const capToy = document.getElementById("capToy");
+  // Элементы
   const factsBox = document.getElementById("factsBox");
+  const barkBtn = document.getElementById("barkBtn");
+  const meowBtn = document.getElementById("meowBtn");
+  const musicToggle = document.getElementById("musicToggle");
+  const languageSelector = document.getElementById("languageSelector");
+  const themeSelector = document.getElementById("themeSelector");
+  const toTopBtn = document.getElementById("toTopBtn");
+  const yukkiAvatar = document.getElementById("yukkiAvatar");
 
-  // Звуки
+  // Аудио
   const bark1 = document.getElementById("barkSound1");
   const bark2 = document.getElementById("barkSound2");
   const meow = document.getElementById("meowSound");
-  let barkToggle = true;
-
-  // Кнопки звуков
-  const barkBtn = document.getElementById("barkBtn");
-  const meowBtn = document.getElementById("meowBtn");
   const bgMusic = document.getElementById("bgMusic");
-  const musicToggle = document.getElementById("musicToggle");
 
-  // Селекторы темы и языка
-  const languageSelector = document.getElementById("languageSelector");
-  const themeSelector = document.getElementById("themeSelector");
+  // Состояния
+  let barkToggle = true;
+  let currentLanguage = "ru";
+  let factsIndex = 0;
+  let currentFacts = texts[currentLanguage].facts;
 
-  // Кнопка наверх
-  const toTopBtn = document.getElementById("toTopBtn");
-
-  // Фоновая музыка - по умолчанию включена и тихая
-  bgMusic.volume = 0.15;
-  bgMusic.play().catch(() => {});
-
-  // Смена языка
+  // Функции обновления текста на выбранном языке
   function changeLanguage(lang) {
-    const t = texts[lang];
-    greetingEl.textContent = t.greeting;
-
-    capNewYear.textContent = t.captions.capNewYear;
-    capPaw.textContent = t.captions.capPaw;
-    capSitting.textContent = t.captions.capSitting;
-    capWinter.textContent = t.captions.capWinter;
-    capCandy.textContent = t.captions.capCandy;
-    capGlasses.textContent = t.captions.capGlasses;
-    capHat.textContent = t.captions.capHat;
-    capToy.textContent = t.captions.capToy;
-
-    currentFacts = t.facts;
+    currentLanguage = lang;
+    document.getElementById("greeting").textContent = texts[lang].greeting;
+    // Обновляем подписи к фото
+    for (const id in texts[lang].captions) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = texts[lang].captions[id];
+    }
+    // Сбрасываем индекс фактов
     factsIndex = 0;
+    currentFacts = texts[lang].facts;
     factsBox.textContent = currentFacts[factsIndex];
   }
 
   // Смена темы
   function changeTheme(theme) {
-    document.body.className = theme;
+    if(theme === "night") {
+      document.body.style.background = "#1e1e2f";
+      document.body.style.color = "#dcdcdc";
+    } else if(theme === "pink") {
+      document.body.style.background = "#ffe4e1";
+      document.body.style.color = "#333";
+    } else {
+      document.body.style.background = "#f5f5f5";
+      document.body.style.color = "#333";
+    }
   }
 
   // Цикл фактов
-  let factsIndex = 0;
-  let currentFacts = texts.ru.facts;
   setInterval(() => {
     factsIndex = (factsIndex + 1) % currentFacts.length;
     factsBox.style.opacity = 0;
@@ -412,21 +356,23 @@
     meow.play();
   });
 
-  // Переключатель музыки
+  // Переключатель музыки с правильной иконкой
   musicToggle.addEventListener("click", () => {
     if (bgMusic.paused) {
       bgMusic.play();
-      musicToggle.textContent = "🔈";
+      musicToggle.textContent = "🔊";
     } else {
       bgMusic.pause();
-      musicToggle.textContent = "🔇";
+      musicToggle.textContent = "🔈";
     }
   });
 
-  // Слушатели селекторов
+  // Обработка выбора языка
   languageSelector.addEventListener("change", (e) => {
     changeLanguage(e.target.value);
   });
+
+  // Обработка выбора темы
   themeSelector.addEventListener("change", (e) => {
     changeTheme(e.target.value);
   });
@@ -439,19 +385,22 @@
       toTopBtn.classList.remove("show");
     }
   });
+
   toTopBtn.addEventListener("click", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  // Начальные установки
-  changeLanguage("ru");
-  changeTheme("day");
-
-  // Приветствие при клике на аватар
-  const yukkiAvatar = document.getElementById("yukkiAvatar");
+  // Приветствие при клике на аватарку
   yukkiAvatar.addEventListener("click", () => {
     alert("гав-гав 💖");
   });
+
+  // Начальная установка
+  changeLanguage(currentLanguage);
+  changeTheme(themeSelector.value);
+  // Иконка музыки изначально включена (🔊)
+  musicToggle.textContent = "🔊";
 </script>
+
 </body>
 </html>
