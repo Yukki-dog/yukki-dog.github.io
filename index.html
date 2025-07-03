@@ -63,9 +63,25 @@
     margin: 10px 5px;
     user-select: none;
     transition: transform 0.2s;
+    position: relative;
   }
   .btn:hover {
     transform: scale(1.05);
+  }
+  .btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 130%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
   }
   .paw {
     font-size: 3rem;
@@ -217,186 +233,242 @@
     font-weight: 600;
     font-size: 1.2rem;
   }
+  /* Кнопки звуков внизу справа */
+  #soundButtons {
+    position: fixed;
+    bottom: 20px;
+    right: 100px;
+    display: flex;
+    gap: 10px;
+    z-index: 130;
+  }
+  .sound-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 30px;
+    padding: 10px 18px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+  }
+  .sound-btn:hover {
+    background-color: #e88ebd;
+  }
+  /* Кнопка фоновой музыки */
+  #musicToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 30px;
+    padding: 10px 16px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: background-color 0.3s;
+    z-index: 140;
+  }
+  #musicToggle:hover {
+    background-color: #e88ebd;
+  }
+  /* Темы */
+  #themeSelector {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: var(--accent);
+    border-radius: 30px;
+    padding: 6px 12px;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    user-select: none;
+    z-index: 150;
+    border: none;
+  }
 </style>
 </head>
-<body class="day loading">
+<body>
 
-  <div id="loader"><div class="paw-icon">🐾</div></div>
+<header>
+  <h1>Yukki</h1>
+  <div id="ageCounter" aria-live="polite" aria-atomic="true"></div>
+</header>
 
-  <header>
-    <h1>Yukki</h1>
-  </header>
+<main class="card" role="main" aria-label="Информация о Юкки">
+  <p>Привет! Я Юкки — самая милая чихуахуа на свете! 💖</p>
+  <p>У меня карие глаза и пушистый хвост с белой кисточкой.</p>
+  <p>Я знаю команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.</p>
+  <p>Очень быстро учусь новым трюкам и люблю гулять в комбинезоне.</p>
+  <p>Обожаю играть с моей любимой игрушкой — ёжиком.</p>
 
-  <main class="card">
-    <p>Привет! Меня зовут Юкки. У меня карие глаза и пушистый хвост с белой кисточкой. Я люблю вкусняшки, спать на кровати и выполнять команды!</p>
-
-    <div id="ageCounter">Возраст: ...</div>
-
-    <div style="margin-top:15px;">
-      <button class="btn" onclick="toggleTheme()">🌗 Сменить тему</button>
-      <button class="btn" onclick="showMore()">❤️ Расскажи больше</button>
-      <button class="btn" onclick="showPaw()">🐾 Дай лапу</button>
+  <div class="gallery" aria-label="Галерея фотографий Юкки">
+    <div class="gallery-item" tabindex="0">
+      <img src="New_year.jfif" alt="Юкки перед ёлкой в шапочке эльфа" />
+      <div class="caption">Юкки перед ёлкой в шапочке эльфа</div>
     </div>
-
-    <div class="paw" id="paw">🐾</div>
-
-    <div class="info-box" id="info">
-      <ul>
-        <li>Знает команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.</li>
-        <li>Любит прятать вкусняшки в фантики.</li>
-        <li>Очень быстро учится новым трюкам.</li>
-      </ul>
+    <div class="gallery-item" tabindex="0">
+      <img src="paw.jfif" alt="Юккина лапка" />
+      <div class="caption">Юккина лапка 🤣</div>
     </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="sitting.jpg" alt="Юкки очень мило сидит" />
+      <div class="caption">Очень мило сидит</div>
+    </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="winter_dog.jfif" alt="Юкки стоит на снегу на двух лапах" />
+      <div class="caption">Стоит на снегу на двух лапах</div>
+    </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="with_candy_(special).jfif" alt="Юкки с конфетой в зубах" />
+      <div class="caption">С конфетой в зубах (умеет открывать фантики!)</div>
+    </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="with_glasses.jfif" alt="Юкки в очках, в которых отображается Киев" />
+      <div class="caption">В очках, в которых отображается Киев 💖</div>
+    </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="with_hat.jfif" alt="Юкки в оригами шапке" />
+      <div class="caption">Оригами шапка</div>
+    </div>
+    <div class="gallery-item" tabindex="0">
+      <img src="with_toy.jfif" alt="Юкки с любимой игрушкой ёжиком" />
+      <div class="caption">Best friends forever 🤍</div>
+    </div>
+  </div>
+</main>
 
-    <section class="gallery" aria-label="Галерея фото Юкки">
-      <div class="gallery-item">
-        <img src="New_year.jfif" alt="Юкки перед ёлкой в шапочке эльфа" />
-        <div class="caption">Юкки перед ёлкой в шапочке эльфа</div>
-      </div>
-      <div class="gallery-item">
-        <img src="paw.jfif" alt="Лапка Юкки" />
-        <div class="caption">Юккина лапка 🤣</div>
-      </div>
-      <div class="gallery-item">
-        <img src="sitting.jpg" alt="Юкки очень мило сидит" />
-        <div class="caption">Очень мило сидит</div>
-      </div>
-      <div class="gallery-item">
-        <img src="winter_dog.jfif" alt="Юкки стоит на снегу на двух лапах" />
-        <div class="caption">Стоит на снегу на двух лапах</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_candy_(special).jfif" alt="Юкки с конфетой в зубах" />
-        <div class="caption">Умеет открывать фантики конфет!</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_glasses.jfif" alt="Юкки в очках с видом на Киев" />
-        <div class="caption">В очках отображается Киев 💖</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_hat.jfif" alt="Юкки с оригами-шапкой" />
-        <div class="caption">Оригами-шапка</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_toy.jfif" alt="Юкки с любимой игрушкой ёжиком" />
-        <div class="caption">Best friends forever 🤍</div>
-      </div>
-    </section>
-  </main>
+<div id="factBox" aria-live="polite" aria-atomic="true">
+  <strong>Факты про Юкки:</strong>
+  <ul>
+    <li>Родилась 1 марта 2021 года.</li>
+    <li>Карие глаза и пушистый хвост с белой кисточкой.</li>
+    <li>Знает команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.</li>
+    <li>Очень быстро учится новым трюкам.</li>
+    <li>Любит гулять в комбинезоне.</li>
+    <li>Обожает играть с любимой игрушкой — ёжиком.</li>
+    <li>Самая милая чихуахуа на свете! 🐶</li>
+  </ul>
+</div>
 
-  <div id="factBox" aria-live="polite" aria-atomic="true">Привет! Это Юкки — самый милый чихуахуа.</div>
+<button id="btnUp" aria-label="Наверх">⬆️</button>
 
-  <div id="yukkiAvatar" title="Нажми на меня! 🐾" tabindex="0" role="button" aria-pressed="false"></div>
+<button id="yukkiAvatar" aria-label="Нажми меня!"></button>
 
-  <button id="btnUp" title="Наверх">↑</button>
+<div id="soundButtons" role="region" aria-label="Звуки Юкки">
+  <button class="sound-btn" id="barkBtn" title="Нажми, чтобы услышать гав-гав!">Гав-гав!</button>
+  <button class="sound-btn" id="meowBtn" title="Нажми, чтобы услышать мяу!">Мяу от Юкки</button>
+</div>
+
+<button id="musicToggle" aria-pressed="false" title="Включить/выключить фоновую музыку">🔈</button>
+
+<select id="themeSelector" aria-label="Выбор темы">
+  <option value="day">Светлая тема</option>
+  <option value="night">Тёмная тема</option>
+  <option value="pink">Розовая тема</option>
+</select>
+
+<audio id="barkSound1" src="1.m4a"></audio>
+<audio id="barkSound2" src="2.m4a"></audio>
+<audio id="meowSound" src="3.m4a"></audio>
+<audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop></audio>
 
 <script>
-  // Анимация загрузки
-  window.addEventListener("load", () => {
-    document.body.classList.remove("loading");
-    document.getElementById("loader").style.display = "none";
-  });
-
-  // Переключение темы день/ночь
-  function toggleTheme() {
-    document.body.classList.toggle("night");
-    updateFactBoxBg();
-  }
-  function updateFactBoxBg() {
-    const factBox = document.getElementById("factBox");
-    if(document.body.classList.contains("night")) {
-      factBox.style.backgroundColor = "rgba(60,60,100,0.3)";
-      factBox.style.color = "#FBE9D3";
-    } else {
-      factBox.style.backgroundColor = "rgba(255,255,255,0.3)";
-      factBox.style.color = "#222";
-    }
-  }
-
-  // Показывать / скрывать подробную информацию
-  function showMore() {
-    const info = document.getElementById("info");
-    if(info.style.display === "block") {
-      info.style.display = "none";
-    } else {
-      info.style.display = "block";
-    }
-  }
-
-  // Показать "дай лапу"
-  function showPaw() {
-    const paw = document.getElementById("paw");
-    paw.style.display = "block";
-    setTimeout(() => {
-      paw.style.display = "none";
-    }, 2000);
-  }
-
-  // Факты для блока внизу слева
-  const facts = [
-    "Я родилась 1 марта 2021 года.",
-    "У меня карие глаза и пушистый хвост с белой кисточкой.",
-    "Знаю команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.",
-    "Люблю прятать вкусняшки в фантики.",
-    "Очень быстро учусь новым трюкам.",
-    "Люблю гулять в комбинезоне.",
-    "Люблю играть с любимой игрушкой – ёжиком.",
-    "Я самая милая чихуахуа на свете! 🐶"
-  ];
-
-  let factIndex = 0;
-  function updateFact() {
-    const factBox = document.getElementById("factBox");
-    factBox.textContent = facts[factIndex];
-    factIndex = (factIndex + 1) % facts.length;
-  }
-  updateFact();
-  setInterval(updateFact, 10000); // менять каждые 10 секунд
-
-  // Аватарка Юкки – по клику выводит "гав-гав 💖"
+  // Аватар "Гав-гав" приветствие
   const avatar = document.getElementById("yukkiAvatar");
-  avatar.addEventListener("click", () => {
-    alert("гав-гав 💖");
-  });
-  avatar.addEventListener("keydown", (e) => {
-    if(e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      avatar.click();
-    }
-  });
+  avatar.addEventListener("click", () => alert("Гав-гав 💖"));
 
-  // Кнопка "Вверх"
-  const btnUp = document.getElementById("btnUp");
-  btnUp.addEventListener("click", () => {
-    window.scrollTo({top: 0, behavior: "smooth"});
-  });
-  window.addEventListener("scroll", () => {
-    if(window.scrollY > 100) {
-      btnUp.classList.add("visible");
-    } else {
-      btnUp.classList.remove("visible");
-    }
-  });
-
-  // Счётчик возраста Юкки
+  // Возраст Юкки
   function calculateAge(birthDate) {
     const now = new Date();
     let years = now.getFullYear() - birthDate.getFullYear();
     let months = now.getMonth() - birthDate.getMonth();
+    let days = now.getDate() - birthDate.getDate();
+    if (days < 0) {
+      months--;
+      days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    }
     if (months < 0) {
       years--;
       months += 12;
     }
-    return {years, months};
+    return {years, months, days};
   }
   function updateAgeCounter() {
-    const birthDate = new Date(2021, 2, 1); // Март - 2 (0-indexed)
+    const birthDate = new Date(2021, 2, 1);
     const age = calculateAge(birthDate);
-    const ageText = `Возраст: ${age.years} ${age.years === 1 ? "год" : "года"}, ${age.months} ${age.months === 1 ? "месяц" : "месяцев"}`;
+    const ageText = `Возраст: ${age.years} ${age.years === 1 ? "год" : "года"}, ${age.months} ${age.months === 1 ? "месяц" : "месяцев"}, ${age.days} дней`;
     document.getElementById("ageCounter").textContent = ageText;
   }
   updateAgeCounter();
 
+  // Кнопка Вверх
+  const btnUp = document.getElementById("btnUp");
+  btnUp.addEventListener("click", () => window.scrollTo({top: 0, behavior: "smooth"}));
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 100) btnUp.classList.add("visible");
+    else btnUp.classList.remove("visible");
+  });
+
+  // Звуки "гав-гав" (поочерёдно) и "мяу"
+  const barkBtn = document.getElementById("barkBtn");
+  const meowBtn = document.getElementById("meowBtn");
+  const barkSound1 = document.getElementById("barkSound1");
+  const barkSound2 = document.getElementById("barkSound2");
+  const meowSound = document.getElementById("meowSound");
+  let barkToggle = true;
+
+  barkBtn.addEventListener("click", () => {
+    if (barkToggle) {
+      barkSound1.currentTime = 0;
+      barkSound1.play();
+    } else {
+      barkSound2.currentTime = 0;
+      barkSound2.play();
+    }
+    barkToggle = !barkToggle;
+  });
+
+  meowBtn.addEventListener("click", () => {
+    meowSound.currentTime = 0;
+    meowSound.play();
+  });
+
+  // Фоновая музыка + кнопка включения/выключения
+  const bgMusic = document.getElementById("bgMusic");
+  const musicToggle = document.getElementById("musicToggle");
+  musicToggle.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = "🔊";
+      musicToggle.setAttribute("aria-pressed", "true");
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = "🔈";
+      musicToggle.setAttribute("aria-pressed", "false");
+    }
+  });
+
+  // Темы оформления
+  const themeSelector = document.getElementById("themeSelector");
+  themeSelector.addEventListener("change", () => {
+    document.body.classList.remove("night", "pink");
+    if (themeSelector.value === "night") {
+      document.body.classList.add("night");
+    } else if (themeSelector.value === "pink") {
+      document.body.classList.add("pink");
+    }
+  });
+
+  // Плавная анимация наведения на фото (уже через CSS hover)
 </script>
 
 </body>
