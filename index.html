@@ -3,312 +3,237 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki</title>
+<title>Yukki - самая милая чихуахуа</title>
 <style>
   :root {
-    --day-bg: #FAE3D3;
-    --night-bg: #2D2D40;
-    --pink-bg: #FFD0E8;
+    --bg-day: #fef6f9;
+    --bg-night: #121212;
+    --bg-pink: #ffe4f0;
     --text-day: #333;
-    --text-night: #FBE9D3;
-    --text-pink: #5a144d;
-    --accent: #FFAACB;
-    --fact-bg-day: rgba(255,255,255,0.3);
-    --fact-bg-night: rgba(60,60,100,0.3);
-    --fact-bg-pink: rgba(255,182,219,0.4);
-  }
-  * {
-    box-sizing: border-box;
+    --text-night: #eee;
+    --text-pink: #b33a6c;
+    --accent: #e559b7;
   }
   body {
     margin: 0; padding: 0;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--day-bg);
+    background-color: var(--bg-day);
     color: var(--text-day);
-    overflow-x: hidden;
-    transition: background-color 0.5s, color 0.5s;
+    transition: background-color 0.4s, color 0.4s;
     min-height: 100vh;
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   body.night {
-    background-color: var(--night-bg);
+    background-color: var(--bg-night);
     color: var(--text-night);
   }
   body.pink {
-    background-color: var(--pink-bg);
+    background-color: var(--bg-pink);
     color: var(--text-pink);
   }
   header {
-    padding: 30px 10px 10px;
-    user-select: none;
+    padding: 1rem;
     text-align: center;
   }
-  h1 {
-    margin: 0; font-size: 2.8rem;
+  header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: var(--accent);
   }
-  .card {
-    max-width: 700px;
-    margin: 20px auto 80px;
-    background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    user-select: none;
-    transition: background-color 0.5s, color 0.5s;
+  main {
+    max-width: 900px;
+    width: 95%;
   }
-  body.night .card {
-    background: #3D3D5A;
-    color: var(--text-night);
+  #greeting {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
   }
-  body.pink .card {
-    background: #ffdaf0;
-    color: var(--text-pink);
+  .info-text {
+    margin: 0.3rem 0;
   }
-  .btn {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 24px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin: 10px 5px;
-    user-select: none;
-    transition: transform 0.2s;
+  #avatar-container {
+    text-align: center;
+    margin: 1rem 0 1.5rem;
     position: relative;
   }
-  .btn:hover {
-    transform: scale(1.05);
-  }
-  .btn[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 130%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.75);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    pointer-events: none;
-    user-select: none;
-  }
-  .paw {
-    font-size: 3rem;
-    margin-top: 10px;
-    display: none;
-    user-select: none;
-  }
-  .info-box {
-    margin-top: 15px;
-    font-size: 1.1rem;
-    text-align: left;
-    background: rgba(255,255,255,0.85);
-    padding: 15px;
-    border-radius: 15px;
-    min-height: 110px;
-    transition: opacity 0.6s ease-in-out;
-    user-select: none;
-  }
-  body.night .info-box {
-    background: rgba(60,60,100,0.85);
-    color: var(--text-night);
-  }
-  body.pink .info-box {
-    background: rgba(255,182,219,0.7);
-    color: var(--text-pink);
-  }
-  /* Галерея */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
-    gap: 15px;
-    user-select: none;
-  }
-  .gallery-item {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-    background: #fff0f5;
-    transition: background-color 0.4s;
-  }
-  body.night .gallery-item {
-    background: #5a5a7f;
-  }
-  body.pink .gallery-item {
-    background: #ffd1e9;
-  }
-  .gallery-item img {
-    width: 100%;
-    display: block;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: transform 0.5s ease;
-  }
-  .gallery-item img:hover {
-    transform: scale(1.1) rotate(5deg);
-  }
-  .caption {
-    font-size: 0.9rem;
-    margin-top: 6px;
-    color: #444;
-  }
-  body.night .caption {
-    color: #ddd;
-  }
-  body.pink .caption {
-    color: #701f58;
-  }
-  /* Факты внизу слева */
-  #factBox {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    max-width: 280px;
-    background-color: var(--fact-bg-day);
-    color: #222;
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.15);
-    font-size: 1rem;
-    user-select: none;
-    transition: background-color 0.5s, color 0.5s, opacity 0.6s;
-    z-index: 100;
-    opacity: 1;
-  }
-  body.night #factBox {
-    background-color: var(--fact-bg-night);
-    color: var(--text-night);
-    box-shadow: 0 0 12px rgba(0,0,0,0.6);
-  }
-  body.pink #factBox {
-    background-color: var(--fact-bg-pink);
-    color: var(--text-pink);
-    box-shadow: 0 0 14px rgba(120,0,90,0.7);
-  }
-  /* Аватар Юкки правый нижний угол */
   #yukkiAvatar {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
+    width: 220px;
+    height: auto;
     border-radius: 50%;
-    border: 3px solid var(--accent);
     cursor: pointer;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    user-select: none;
-    background: url("with_hat.jfif") center center/cover no-repeat;
-    transition: transform 0.3s;
-    z-index: 110;
+    box-shadow: 0 0 15px rgba(229, 89, 183, 0.6);
+    transition: transform 0.3s ease;
   }
   #yukkiAvatar:hover {
-    transform: scale(1.1);
+    transform: scale(1.08) rotate(5deg);
   }
-  /* Кнопка Вверх */
-  #btnUp {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 16px;
-    font-size: 1.6rem;
-    cursor: pointer;
-    user-select: none;
-    box-shadow: 0 6px 14px rgba(255,170,203,0.9);
-    transition: background-color 0.3s, opacity 0.4s;
-    z-index: 120;
-    opacity: 0;
-    pointer-events: none;
-  }
-  #btnUp.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  #btnUp:hover {
-    background-color: #e88ebd;
-  }
-  /* Звуковые кнопки справа снизу */
   #soundButtons {
-    position: fixed;
-    bottom: 20px;
-    right: 100px;
+    position: absolute;
+    top: 5px;
+    right: -140px;
     display: flex;
     gap: 10px;
-    z-index: 130;
   }
   .sound-btn {
     background: var(--accent);
     border: none;
-    border-radius: 30px;
-    padding: 10px 18px;
     color: white;
-    font-weight: 700;
-    font-size: 1rem;
+    font-weight: bold;
+    padding: 8px 14px;
+    border-radius: 25px;
     cursor: pointer;
     user-select: none;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     transition: background-color 0.3s;
   }
   .sound-btn:hover {
-    background-color: #e88ebd;
+    background-color: #b33273;
   }
-  /* Кнопка фоновой музыки */
   #musicToggle {
     position: fixed;
-    bottom: 20px;
-    right: 75px;
+    top: 15px;
+    right: 20px;
     background: var(--accent);
     border: none;
-    border-radius: 30px;
-    padding: 10px 16px;
     color: white;
-    font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    padding: 8px 14px;
+    border-radius: 50%;
     cursor: pointer;
     user-select: none;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     transition: background-color 0.3s;
-    z-index: 140;
+    z-index: 1000;
   }
   #musicToggle:hover {
-    background-color: #e88ebd;
+    background-color: #b33273;
   }
-  /* Селектор темы */
-  #themeSelector {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: var(--accent);
-    border-radius: 30px;
-    padding: 6px 14px;
-    font-weight: 700;
+  #gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+    gap: 12px;
+    margin-bottom: 1.8rem;
+  }
+  .gallery-item {
+    position: relative;
+    cursor: default;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(229,89,183,0.3);
+    background: #fff;
+  }
+  .gallery-item img {
+    width: 100%;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .gallery-item:hover img {
+    transform: scale(1.12) rotate(4deg);
+  }
+  .caption {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    right: 5px;
+    background: rgba(229, 89, 183, 0.85);
     color: white;
-    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 4px 7px;
+    border-radius: 8px;
+    text-align: center;
     user-select: none;
-    z-index: 150;
-    border: none;
   }
-  /* Селектор языка */
+  #factsBox {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    max-width: 280px;
+    background: rgba(255 255 255 / 0.7);
+    color: #b33a6c;
+    padding: 10px 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    transition: opacity 0.6s ease;
+    user-select: none;
+    box-shadow: 0 0 10px rgba(229,89,183,0.5);
+  }
+  #factsBox.night {
+    background: rgba(18, 18, 18, 0.7);
+    color: var(--text-night);
+    box-shadow: 0 0 10px rgba(229,89,183,0.8);
+  }
+  #foodSection {
+    background: rgba(229, 89, 183, 0.1);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 2rem;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  #foodSection span.emoji {
+    margin-right: 6px;
+  }
   #languageSelector {
     position: fixed;
     top: 20px;
-    left: 160px;
-    background: var(--accent);
-    border-radius: 30px;
-    padding: 6px 14px;
-    font-weight: 700;
-    color: white;
+    left: 20px;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 12px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
     cursor: pointer;
     user-select: none;
-    z-index: 150;
+    transition: background-color 0.3s, color 0.3s;
+    z-index: 1000;
+  }
+  #languageSelector:hover {
+    background-color: var(--accent);
+    color: white;
+  }
+  #themeSelector {
+    position: fixed;
+    top: 20px;
+    left: 140px;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 12px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s, color 0.3s;
+    z-index: 1000;
+  }
+  #themeSelector:hover {
+    background-color: var(--accent);
+    color: white;
+  }
+  #toTopBtn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: var(--accent);
     border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 10px 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 0 10px var(--accent);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+    z-index: 1000;
+  }
+  #toTopBtn.show {
+    opacity: 1;
+    visibility: visible;
   }
 </style>
 </head>
@@ -316,180 +241,90 @@
 
 <header>
   <h1>Yukki</h1>
-  <div id="ageCounter" aria-live="polite" aria-atomic="true" aria-label="Возраст Юкки"></div>
 </header>
 
-<main class="card" role="main" aria-label="Информация о Юкки">
+<main>
   <p id="greeting">Привет! Я Юкки — самая милая чихуахуа на свете! 💖</p>
-  <p id="eyesTail">У меня карие глаза и пушистый хвост с белой кисточкой.</p>
-  <p id="commandsKnown">Я знаю команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.</p>
-  <p id="learning">Очень быстро учусь новым трюкам и люблю гулять в комбинезоне.</p>
-  <p id="favoriteToy">Обожаю играть с моей любимой игрушкой — ёжиком.</p>
+  <p class="info-text" id="eyesTail">У меня карие глаза и пушистый хвост с белой кисточкой.</p>
+  <p class="info-text" id="commandsKnown">Я знаю команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.</p>
+  <p class="info-text" id="learning">Очень быстро учусь новым трюкам и люблю гулять в комбинезоне.</p>
+  <p class="info-text" id="favoriteToy">Обожаю играть с моей любимой игрушкой — ёжиком.</p>
 
-  <div class="gallery" aria-label="Галерея фотографий Юкки">
-    <div class="gallery-item" tabindex="0">
-      <img src="New_year.jfif" alt="Юкки перед ёлкой в шапочке эльфа" />
-      <div class="caption" id="capNewYear">Юкки перед ёлкой в шапочке эльфа</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="paw.jfif" alt="Юккина лапка" />
-      <div class="caption" id="capPaw">Юккина лапка 🤣</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="sitting.jpg" alt="Юкки очень мило сидит" />
-      <div class="caption" id="capSitting">Очень мило сидит</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="winter_dog.jfif" alt="Юкки стоит на снегу на двух лапах" />
-      <div class="caption" id="capWinter">Стоит на снегу на двух лапах</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="with_candy_(special).jfif" alt="Юкки с конфетой в зубах" />
-      <div class="caption" id="capCandy">С конфетой в зубах (умеет открывать фантики!)</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="with_glasses.jfif" alt="Юкки в очках, в которых отображается Киев" />
-      <div class="caption" id="capGlasses">В очках, в которых отображается Киев 💖</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="with_hat.jfif" alt="Юкки в оригами шапке" />
-      <div class="caption" id="capHat">Оригами шапка</div>
-    </div>
-    <div class="gallery-item" tabindex="0">
-      <img src="with_toy.jfif" alt="Юкки с любимой игрушкой ёжиком" />
-      <div class="caption" id="capToy">Best friends forever 🤍</div>
+  <div id="avatar-container">
+    <img src="cute.jfif" alt="Юкки" id="yukkiAvatar" title="Нажми меня — услышь 'гав-гав!'" />
+    <div id="soundButtons">
+      <button class="sound-btn" id="barkBtn">Гав-гав!</button>
+      <button class="sound-btn" id="meowBtn">Мяу от Юкки</button>
     </div>
   </div>
+
+  <section id="gallery">
+    <div class="gallery-item" title="Yukki в новогодней шапочке">
+      <img src="New_year.jfif" alt="Юкки перед ёлкой" />
+      <div class="caption" id="capNewYear">Юкки перед ёлкой в шапочке эльфа</div>
+    </div>
+    <div class="gallery-item" title="Юккина лапка">
+      <img src="paw.jfif" alt="Юккина лапка" />
+      <div class="caption" id="capPaw">Юккина лапка</div>
+    </div>
+    <div class="gallery-item" title="Юкки мило сидит">
+      <img src="sitting.jpg" alt="Юкки сидит" />
+      <div class="caption" id="capSitting">Очень мило сидит</div>
+    </div>
+    <div class="gallery-item" title="Юкки на снегу">
+      <img src="winter_dog.jfif" alt="Юкки на снегу" />
+      <div class="caption" id="capWinter">Стоит на снегу на двух лапах</div>
+    </div>
+    <div class="gallery-item" title="Юкки с конфетой">
+      <img src="with_candy_(special).jfif" alt="Юкки с конфетой" />
+      <div class="caption" id="capCandy">С конфетой в зубах (умеет открывать фантики!)</div>
+    </div>
+    <div class="gallery-item" title="Юкки в очках">
+      <img src="with_glasses.jfif" alt="Юкки в очках" />
+      <div class="caption" id="capGlasses">В очках, в которых отображается Киев 💖</div>
+    </div>
+    <div class="gallery-item" title="Юкки с оригами шапкой">
+      <img src="with_hat.jfif" alt="Юкки с шапкой" />
+      <div class="caption" id="capHat">Оригами шапка</div>
+    </div>
+    <div class="gallery-item" title="Юкки с игрушкой">
+      <img src="with_toy.jfif" alt="Юкки с игрушкой" />
+      <div class="caption" id="capToy">Best friends forever 🤍</div>
+    </div>
+  </section>
+
+  <section id="foodSection">
+    <strong>Что любит кушать Юкки:</strong><br />
+    <span class="emoji">🥕</span>Морковку, кабачки и другие овощи,<br />
+    <span class="emoji">🍗</span>мясо индюшки, кролика и телятины,<br />
+    <span class="emoji">🐟</span>корм Gastrointestinal с белой рыбой,<br />
+    <span class="emoji">🧀</span>нежирный творог 0% жирности.
+  </section>
 </main>
 
-<div id="factBox" aria-live="polite" aria-atomic="true" role="complementary" aria-label="Факты про Юкки">
-  <!-- Здесь будет поочерёдно появляться один факт -->
-</div>
+<div id="factsBox"></div>
 
-<button id="btnUp" aria-label="Наверх" title="Наверх">⬆️</button>
-
-<button id="yukkiAvatar" aria-label="Нажми меня!"></button>
-
-<div id="soundButtons" role="region" aria-label="Звуки Юкки">
-  <button class="sound-btn" id="barkBtn" title="Нажми, чтобы услышать гав-гав!">Гав-гав!</button>
-  <button class="sound-btn" id="meowBtn" title="Нажми, чтобы услышать мяу!">Мяу от Юкки</button>
-</div>
-
-<button id="musicToggle" aria-pressed="false" title="Включить/выключить фоновую музыку">🔈</button>
-
-<select id="themeSelector" aria-label="Выбор темы">
-  <option value="day">Светлая тема</option>
-  <option value="night">Тёмная тема</option>
-  <option value="pink">Розовая тема</option>
-</select>
-
-<select id="languageSelector" aria-label="Выбор языка">
-  <option value="ru">Русский</option>
+<select id="languageSelector" title="Выберите язык">
+  <option value="ru" selected>Русский</option>
   <option value="uk">Українська</option>
   <option value="en">English</option>
 </select>
 
+<select id="themeSelector" title="Выберите тему">
+  <option value="day" selected>Светлая</option>
+  <option value="night">Тёмная</option>
+  <option value="pink">Розовая</option>
+</select>
+
+<button id="musicToggle" title="Вкл/Выкл музыку">🔈</button>
+<button id="toTopBtn" title="Наверх">⬆️</button>
+
+<audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop></audio>
 <audio id="barkSound1" src="1.m4a"></audio>
 <audio id="barkSound2" src="2.m4a"></audio>
 <audio id="meowSound" src="3.m4a"></audio>
-<audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop></audio>
 
 <script>
-  // Переменные для звуков
-  const barkSound1 = document.getElementById("barkSound1");
-  const barkSound2 = document.getElementById("barkSound2");
-  const meowSound = document.getElementById("meowSound");
-  const bgMusic = document.getElementById("bgMusic");
-
-  // Аватар "гав-гав" приветствие
-  const avatar = document.getElementById("yukkiAvatar");
-  avatar.addEventListener("click", () => alert("Гав-гав 💖"));
-
-  // Возраст Юкки
-  function calculateAge(birthDate) {
-    const now = new Date();
-    let years = now.getFullYear() - birthDate.getFullYear();
-    let months = now.getMonth() - birthDate.getMonth();
-    let days = now.getDate() - birthDate.getDate();
-    if (days < 0) {
-      months--;
-      days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-    }
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-    return {years, months, days};
-  }
-  function updateAgeCounter() {
-    const birthDate = new Date(2021, 2, 1);
-    const age = calculateAge(birthDate);
-    const ageText = `Возраст: ${age.years} ${age.years === 1 ? "год" : "года"}, ${age.months} ${age.months === 1 ? "месяц" : "месяцев"}, ${age.days} дней`;
-    document.getElementById("ageCounter").textContent = ageText;
-  }
-  updateAgeCounter();
-
-  // Кнопка "Вверх"
-  const btnUp = document.getElementById("btnUp");
-  btnUp.addEventListener("click", () => window.scrollTo({top: 0, behavior: "smooth"}));
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 100) btnUp.classList.add("visible");
-    else btnUp.classList.remove("visible");
-  });
-
-  // Звуки "гав-гав" (поочерёдно) и "мяу"
-  const barkBtn = document.getElementById("barkBtn");
-  const meowBtn = document.getElementById("meowBtn");
-  let barkToggle = true;
-
-  function stopAllSounds() {
-    [barkSound1, barkSound2, meowSound, bgMusic].forEach(audio => {
-      audio.pause();
-      audio.currentTime = 0;
-    });
-  }
-
-  barkBtn.addEventListener("click", () => {
-    stopAllSounds();
-    if (barkToggle) {
-      barkSound1.play();
-    } else {
-      barkSound2.play();
-    }
-    barkToggle = !barkToggle;
-  });
-
-  meowBtn.addEventListener("click", () => {
-    stopAllSounds();
-    meowSound.play();
-  });
-
-  // Фоновая музыка + кнопка включения/выключения
-  const musicToggle = document.getElementById("musicToggle");
-  musicToggle.addEventListener("click", () => {
-    if (bgMusic.paused) {
-      bgMusic.play();
-      musicToggle.textContent = "🔊";
-      musicToggle.setAttribute("aria-pressed", "true");
-    } else {
-      bgMusic.pause();
-      musicToggle.textContent = "🔈";
-      musicToggle.setAttribute("aria-pressed", "false");
-    }
-  });
-
-  // Темы оформления
-  const themeSelector = document.getElementById("themeSelector");
-  themeSelector.addEventListener("change", () => {
-    document.body.classList.remove("night", "pink");
-    if (themeSelector.value === "night") {
-      document.body.classList.add("night");
-    } else if (themeSelector.value === "pink") {
-      document.body.classList.add("pink");
-    }
-  });
-
-  // Тексты для разных языков
   const texts = {
     ru: {
       greeting: "Привет! Я Юкки — самая милая чихуахуа на свете! 💖",
@@ -499,7 +334,7 @@
       favoriteToy: "Обожаю играть с моей любимой игрушкой — ёжиком.",
       captions: {
         capNewYear: "Юкки перед ёлкой в шапочке эльфа",
-        capPaw: "Юккина лапка ",
+        capPaw: "Юккина лапка",
         capSitting: "Очень мило сидит",
         capWinter: "Стоит на снегу на двух лапах",
         capCandy: "С конфетой в зубах (умеет открывать фантики!)",
@@ -527,48 +362,48 @@
       favoriteToy: "Обожнюю гратись із улюбленою іграшкою — їжачком.",
       captions: {
         capNewYear: "Юккі перед ялинкою у шапочці ельфа",
-        capPaw: "Юккіна лапка ",
+        capPaw: "Юккіна лапка",
         capSitting: "Дуже мило сидить",
         capWinter: "Стоїть на снігу на двох лапах",
         capCandy: "З цукеркою в зубах (уміє відкривати фантики!)",
         capGlasses: "В окулярах, в яких відображається Київ 💖",
-        capHat: "Оригамі шапка",
+        capHat: "Орігамі шапка",
         capToy: "Best friends forever 🤍"
       },
       facts: [
-        "Народилася 1 березня 2021 року.",
+        "Народилась 1 березня 2021 року.",
         "У неї карі очі.",
         "Пухнастий хвіст із білою китичкою на кінці.",
         "Знає команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
         "Любить гуляти в комбінезоні.",
-        "Вміє відкривати фантики цукерок, де ховають ласощі.",
-        "Дуже розумна і швидко вчиться.",
-        "Обожнює гратись із улюбленою іграшкою — їжачком.",
-        "Іноді сором’язлива, але дуже добра і ласкава."
+        "Уміє відкривати фантики цукерок, де ховають смаколики.",
+        "Дуже розумна і швидко навчається.",
+        "Обожнює гратися з улюбленою іграшкою — їжачком.",
+        "Іноді сором’язлива, але дуже добра і лагідна."
       ]
     },
     en: {
-      greeting: "Hi! I'm Yukki — the cutest Chihuahua in the world! 💖",
+      greeting: "Hi! I'm Yukki — the cutest Chihuahua ever! 💖",
       eyesTail: "I have brown eyes and a fluffy tail with a white tip.",
       commandsKnown: "I know commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
-      learning: "I learn new tricks very fast and love walking in my jumpsuit.",
+      learning: "I learn new tricks very fast and love to walk in my jumpsuit.",
       favoriteToy: "I love playing with my favorite toy — a hedgehog.",
       captions: {
-        capNewYear: "Yukki in front of the Christmas tree wearing an elf hat",
-        capPaw: "Yukki's paw ",
+        capNewYear: "Yukki in an elf hat by the Christmas tree",
+        capPaw: "Yukki's paw",
         capSitting: "Sitting very cutely",
-        capWinter: "Standing on snow on two front paws",
-        capCandy: "With candy in her teeth (she can open candy wrappers!)",
-        capGlasses: "Wearing glasses reflecting Kyiv 💖",
+        capWinter: "Standing on two paws in the snow",
+        capCandy: "With candy in her teeth (can open wrappers!)",
+        capGlasses: "In glasses showing Kyiv 💖",
         capHat: "Origami hat",
         capToy: "Best friends forever 🤍"
       },
       facts: [
         "Born on March 1, 2021.",
-        "She has brown eyes.",
+        "Has brown eyes.",
         "Fluffy tail with a white tip.",
         "Knows commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
-        "Loves walking in her jumpsuit.",
+        "Loves walking in a jumpsuit.",
         "Can open candy wrappers where treats are hidden.",
         "Very smart and learns quickly.",
         "Loves playing with her favorite toy — a hedgehog.",
@@ -577,74 +412,160 @@
     }
   };
 
-  // Обновление текста по языку
-  const langSelect = document.getElementById("languageSelector");
-  const greetingP = document.getElementById("greeting");
-  const eyesTailP = document.getElementById("eyesTail");
-  const commandsKnownP = document.getElementById("commandsKnown");
-  const learningP = document.getElementById("learning");
-  const favoriteToyP = document.getElementById("favoriteToy");
-  const factBox = document.getElementById("factBox");
+  // Элементы для смены текста
+  const greetingEl = document.getElementById("greeting");
+  const eyesTailEl = document.getElementById("eyesTail");
+  const commandsKnownEl = document.getElementById("commandsKnown");
+  const learningEl = document.getElementById("learning");
+  const favoriteToyEl = document.getElementById("favoriteToy");
 
-  // Капшены картинок
-  function updateCaptions(lang) {
-    const caps = texts[lang].captions;
-    Object.entries(caps).forEach(([id, text]) => {
-      const el = document.getElementById(id);
-      if(el) el.textContent = text;
-    });
+  // Капшены под фото
+  const capNewYear = document.getElementById("capNewYear");
+  const capPaw = document.getElementById("capPaw");
+  const capSitting = document.getElementById("capSitting");
+  const capWinter = document.getElementById("capWinter");
+  const capCandy = document.getElementById("capCandy");
+  const capGlasses = document.getElementById("capGlasses");
+  const capHat = document.getElementById("capHat");
+  const capToy = document.getElementById("capToy");
+
+  // Факты
+  const factsBox = document.getElementById("factsBox");
+
+  // Звуки
+  const bark1 = document.getElementById("barkSound1");
+  const bark2 = document.getElementById("barkSound2");
+  const meow = document.getElementById("meowSound");
+  let barkToggle = true;
+
+  // Элементы кнопок звука
+  const barkBtn = document.getElementById("barkBtn");
+  const meowBtn = document.getElementById("meowBtn");
+  const bgMusic = document.getElementById("bgMusic");
+  const musicToggle = document.getElementById("musicToggle");
+
+  // Тема и язык
+  const languageSelector = document.getElementById("languageSelector");
+  const themeSelector = document.getElementById("themeSelector");
+
+  // Кнопка наверх
+  const toTopBtn = document.getElementById("toTopBtn");
+
+  // Фоновая музыка - по умолчанию включена
+  bgMusic.volume = 0.15;
+  bgMusic.play().catch(() => {
+    // Автозапуск может быть заблокирован браузером
+  });
+
+  // Функция смены языка
+  function changeLanguage(lang) {
+    const t = texts[lang];
+    greetingEl.textContent = t.greeting;
+    eyesTailEl.textContent = t.eyesTail;
+    commandsKnownEl.textContent = t.commandsKnown;
+    learningEl.textContent = t.learning;
+    favoriteToyEl.textContent = t.favoriteToy;
+
+    capNewYear.textContent = t.captions.capNewYear;
+    capPaw.textContent = t.captions.capPaw;
+    capSitting.textContent = t.captions.capSitting;
+    capWinter.textContent = t.captions.capWinter;
+    capCandy.textContent = t.captions.capCandy;
+    capGlasses.textContent = t.captions.capGlasses;
+    capHat.textContent = t.captions.capHat;
+    capToy.textContent = t.captions.capToy;
+
+    currentFacts = t.facts;
+    currentFactIndex = 0;
+    factsBox.textContent = currentFacts[0];
   }
 
-  // Показывать факты по одному, циклом
-  let factIndex = 0;
-  function showFact(lang) {
-    const facts = texts[lang].facts;
-    factBox.style.opacity = 0;
+  // Факты по очереди каждые 10 секунд
+  let currentFacts = texts.ru.facts;
+  let currentFactIndex = 0;
+  function nextFact() {
+    currentFactIndex = (currentFactIndex + 1) % currentFacts.length;
+    factsBox.style.opacity = 0;
     setTimeout(() => {
-      factBox.textContent = facts[factIndex];
-      factBox.style.opacity = 1;
-      factIndex = (factIndex + 1) % facts.length;
+      factsBox.textContent = currentFacts[currentFactIndex];
+      factsBox.style.opacity = 1;
     }, 600);
   }
+  setInterval(nextFact, 10000);
 
-  function updateLanguage() {
-    const lang = langSelect.value;
-    const t = texts[lang];
-    greetingP.textContent = t.greeting;
-    eyesTailP.textContent = t.eyesTail;
-    commandsKnownP.textContent = t.commandsKnown;
-    learningP.textContent = t.learning;
-    favoriteToyP.textContent = t.favoriteToy;
-    updateCaptions(lang);
-    factIndex = 0;
-    showFact(lang);
-  }
-  langSelect.addEventListener("change", updateLanguage);
-
-  updateLanguage();
-
-  // Запуск цикла показа фактов каждые 10 секунд
-  setInterval(() => showFact(langSelect.value), 10000);
-
-  // Позиция кнопки звука
-  const musicToggleBtn = document.getElementById("musicToggle");
-  const avatarEl = document.getElementById("yukkiAvatar");
-  const soundButtons = document.getElementById("soundButtons");
-
-  // Подвинем кнопки чтобы не пересекались
-  function positionButtons() {
-    // Если ширина маленькая, сбросим позицию
-    if(window.innerWidth < 450) {
-      musicToggleBtn.style.right = "20px";
-      soundButtons.style.right = "80px";
+  // Кнопка Гав-гав: чередуем 2 звука
+  barkBtn.addEventListener("click", () => {
+    if (!bgMusic.paused) bgMusic.volume = 0.05; // чуть тише музыка во время звука
+    if (barkToggle) {
+      bark1.currentTime = 0;
+      bark1.play();
     } else {
-      musicToggleBtn.style.right = "75px";
-      soundButtons.style.right = "100px";
+      bark2.currentTime = 0;
+      bark2.play();
     }
-  }
-  window.addEventListener("resize", positionButtons);
-  positionButtons();
+    barkToggle = !barkToggle;
+    setTimeout(() => {
+      bgMusic.volume = 0.15;
+    }, 2000);
+  });
 
+  // Кнопка Мяу
+  meowBtn.addEventListener("click", () => {
+    if (!bgMusic.paused) bgMusic.volume = 0.05;
+    meow.currentTime = 0;
+    meow.play();
+    setTimeout(() => {
+      bgMusic.volume = 0.15;
+    }, 1500);
+  });
+
+  // При клике на аватар — простой гав-гав
+  document.getElementById("yukkiAvatar").addEventListener("click", () => {
+    bark1.currentTime = 0;
+    bark1.play();
+  });
+
+  // Переключатель музыки
+  musicToggle.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = "🔈";
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = "🔇";
+    }
+  });
+
+  // Смена темы
+  themeSelector.addEventListener("change", () => {
+    document.body.classList.remove("day", "night", "pink");
+    const val = themeSelector.value;
+    if (val === "day") document.body.classList.add("day");
+    else if (val === "night") document.body.classList.add("night");
+    else if (val === "pink") document.body.classList.add("pink");
+
+    // Подсветка фактов под тему
+    if (val === "night") factsBox.classList.add("night");
+    else factsBox.classList.remove("night");
+  });
+
+  // Смена языка
+  languageSelector.addEventListener("change", () => {
+    changeLanguage(languageSelector.value);
+  });
+
+  // Кнопка Наверх
+  toTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+  window.addEventListener("scroll", () => {
+    if (window.pageYOffset > 150) toTopBtn.classList.add("show");
+    else toTopBtn.classList.remove("show");
+  });
+
+  // Инициализация
+  changeLanguage("ru");
+  document.body.classList.add("day");
 </script>
 
 </body>
