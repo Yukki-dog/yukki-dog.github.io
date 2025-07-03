@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Юкки — звезда 🐶</title>
+  <title>Юкки v2.5 — самая милая чихуахуа 🐶</title>
   <style>
     :root {
       --day-bg: #FAE3D3;
@@ -10,21 +10,48 @@
       --text-day: #333;
       --text-night: #FBE9D3;
       --accent: #FFAACB;
+      --fact-bg: rgba(255, 255, 255, 0.3);
+      --fact-bg-night: rgba(60, 60, 100, 0.3);
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       text-align: center;
-      transition: background 0.6s, color 0.6s;
       background-color: var(--day-bg);
       color: var(--text-day);
+      overflow-x: hidden;
+      transition: background 0.6s, color 0.6s;
+      position: relative;
+      min-height: 100vh;
     }
     body.night {
       background-color: var(--night-bg);
       color: var(--text-night);
     }
+
+    /* Анимация облаков на фоне */
+    #clouds {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background:
+        url('https://i.ibb.co/NxqJ4hr/cloud1.png') repeat-x 0 20px,
+        url('https://i.ibb.co/3fJzTfP/cloud2.png') repeat-x 0 80px;
+      background-size: 300px 80px, 200px 50px;
+      animation: moveClouds 60s linear infinite;
+      z-index: -1;
+    }
+    @keyframes moveClouds {
+      0% {background-position: 0 20px, 0 80px;}
+      100% {background-position: 600px 20px, 400px 80px;}
+    }
+
     header {
       padding: 30px 10px 10px;
+      user-select: none;
     }
     h1 {
       font-size: 2.8em;
@@ -34,11 +61,12 @@
       background: white;
       border-radius: 15px;
       padding: 20px;
-      margin: 20px auto;
+      margin: 20px auto 80px;
       width: 90%;
       max-width: 700px;
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
       transition: background 0.6s;
+      user-select: none;
     }
     body.night .card {
       background: #3D3D5A;
@@ -53,6 +81,7 @@
       cursor: pointer;
       margin: 10px 5px;
       transition: transform 0.2s;
+      user-select: none;
     }
     .btn:hover {
       transform: scale(1.05);
@@ -61,6 +90,7 @@
       font-size: 3em;
       display: none;
       margin-top: 10px;
+      user-select: none;
     }
     .info-box {
       background: rgba(255, 255, 255, 0.85);
@@ -70,6 +100,7 @@
       display: none;
       text-align: left;
       font-size: 1.1em;
+      user-select: none;
     }
     body.night .info-box {
       background: rgba(60, 60, 100, 0.85);
@@ -79,6 +110,7 @@
       grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
       gap: 15px;
       margin-top: 20px;
+      user-select: none;
     }
     .gallery-item {
       background: #fff0f5;
@@ -86,6 +118,8 @@
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
       padding: 10px;
       transition: background 0.4s;
+      overflow: hidden;
+      position: relative;
     }
     body.night .gallery-item {
       background: #5a5a7f;
@@ -95,36 +129,128 @@
       border-radius: 12px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      transition: transform 0.3s;
+      transition: transform 0.5s ease;
+      will-change: transform;
+      user-select: none;
     }
     .gallery-item img:hover {
-      transform: scale(1.05);
+      transform: scale(1.1) rotate(5deg);
     }
     .caption {
       margin-top: 8px;
       font-size: 0.9em;
       color: #444;
+      user-select: none;
     }
     body.night .caption {
       color: #ddd;
     }
-    video {
-      max-width: 100%;
-      border-radius: 15px;
-      margin-top: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    footer {
-      margin-top: 40px;
+
+    /* Полупрозрачный блок с фактами внизу слева */
+    #factBox {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      max-width: 250px;
+      background-color: var(--fact-bg);
+      padding: 15px 20px;
+      border-radius: 12px;
       font-size: 0.9em;
-      opacity: 0.7;
+      color: #222;
+      box-shadow: 0 0 12px rgba(0,0,0,0.15);
+      user-select: none;
+      transition: background-color 0.6s, color 0.6s;
+      z-index: 100;
     }
+    body.night #factBox {
+      background-color: var(--fact-bg-night);
+      color: var(--text-night);
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    }
+
+    /* Аватар Юкки в правом нижнем углу */
+    #yukkiAvatar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 3px solid var(--accent);
+      cursor: pointer;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: transform 0.3s;
+      user-select: none;
+      z-index: 110;
+      background: url('with_hat.jfif') center center/cover no-repeat;
+    }
+    #yukkiAvatar:hover {
+      transform: scale(1.1);
+    }
+
+    /* Кнопка Вверх */
+    #btnUp {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 16px;
+      font-size: 1.2em;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      transition: background-color 0.3s;
+      z-index: 120;
+    }
+    #btnUp:hover {
+      background-color: #e88ebd;
+    }
+
+    /* Анимация загрузки - лапка стучит */
+    #loader {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100px;
+      height: 100px;
+      margin-left: -50px;
+      margin-top: -50px;
+      z-index: 9999;
+      pointer-events: none;
+      user-select: none;
+    }
+    #loader .paw-icon {
+      font-size: 5rem;
+      animation: pawTap 1s ease-in-out infinite;
+      color: var(--accent);
+      filter: drop-shadow(0 0 3px #FFAACB);
+    }
+    @keyframes pawTap {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    /* Убираем скроллбар, когда загрузка */
+    body.loading {
+      overflow: hidden;
+    }
+
   </style>
 </head>
-<body class="day">
+<body class="day loading">
+
+  <div id="loader"><div class="paw-icon">🐾</div></div>
+
+  <div id="clouds"></div>
+
   <header>
     <h1>Юкки — самая милая чихуахуа 🐶</h1>
   </header>
+
   <div class="card">
     <p>Привет! Меня зовут Юкки. Я люблю вкусняшки, спать на кровати и выполнять команды!</p>
     <div>
@@ -135,80 +261,4 @@
     <div class="paw" id="paw">🐾</div>
 
     <div class="info-box" id="info">
-      <h3>Интересные факты о Юкки:</h3>
-      <ul>
-        <li><strong>Возраст:</strong> 3 года</li>
-        <li><strong>Цвет:</strong> чёрно-белая, с белыми носочками 🖤🤍</li>
-        <li><strong>Любимая команда:</strong> "Спокойной ночи" 💤</li>
-        <li><strong>Не дружит с другими собаками 😅</strong></li>
-        <li><strong>Очень ласковая и умная!</strong></li>
-      </ul>
-    </div>
-
-    <div class="gallery">
-      <div class="gallery-item">
-        <img src="New_year.jfif" alt="Юкки у ёлки" />
-        <div class="caption">Юкки перед ёлкой в шапочке эльфа 🎄</div>
-      </div>
-      <div class="gallery-item">
-        <img src="paw.jfif" alt="Юккина лапка" />
-        <div class="caption">Юккина лапка 🐾</div>
-      </div>
-      <div class="gallery-item">
-        <img src="sitting.jpg" alt="Юкки сидит" />
-        <div class="caption">Очень милая Юкки 🥰</div>
-      </div>
-      <div class="gallery-item">
-        <img src="winter_dog.jfif" alt="Юкки на снегу" />
-        <div class="caption">Юкки на снегу ❄️</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_candy_(special).jfif" alt="Юкки с конфетой" />
-        <div class="caption">Юкки с конфетой 🍬</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_glasses.jfif" alt="Юкки в очках" />
-        <div class="caption">Юкки в очках 🕶️</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_hat.jfif" alt="Юкки с оригами шапкой" />
-        <div class="caption">Юкки в оригами-шапке 🎩</div>
-      </div>
-      <div class="gallery-item">
-        <img src="with_toy.jfif" alt="Юкки с игрушкой" />
-        <div class="caption">Юкки и ёжик 🤍</div>
-      </div>
-    </div>
-
-    <video controls>
-      <source src="walking.MOV" type="video/quicktime" />
-      Твой браузер не поддерживает видео.
-    </video>
-  </div>
-  <footer>
-    © 2025 Юкки. Сделано с любовью 🐶🩷
-  </footer>
-
-  <script>
-    function showPaw() {
-      const paw = document.getElementById('paw');
-      paw.style.display = 'block';
-      setTimeout(() => paw.style.display = 'none', 2000);
-    }
-    function showMore() {
-      const info = document.getElementById('info');
-      info.style.display = info.style.display === 'block' ? 'none' : 'block';
-    }
-    function toggleTheme() {
-      const body = document.body;
-      body.classList.toggle('night');
-      body.classList.toggle('day');
-    }
-    const hour = new Date().getHours();
-    if (hour >= 19 || hour < 7) {
-      document.body.classList.remove('day');
-      document.body.classList.add('night');
-    }
-  </script>
-</body>
-</html>
+      <
