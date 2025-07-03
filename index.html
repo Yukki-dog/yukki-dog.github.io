@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki — самая милая чихуахуа</title>
+<title>Yukki</title>
 <style>
   body {
     margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -462,7 +462,7 @@
     if (isMusicOn) {
       bgMusic.pause();
       isMusicOn = false;
-      musicToggle.textContent = "🔇";
+      musicToggle.textContent = "🔈";
     } else {
       bgMusic.play();
       isMusicOn = true;
@@ -470,146 +470,182 @@
     }
   });
 
-  // ---- Кнопка Наверх ----
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 100) {
-      toTopBtn.classList.add("show");
-    } else {
-      toTopBtn.classList.remove("show");
-    }
-  });
-  toTopBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+ // ---- Кнопка Наверх ----
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 100) {
+    toTopBtn.classList.add("show");
+  } else {
+    toTopBtn.classList.remove("show");
+  }
+});
+toTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
 
-  // ---- Клик по аватару - лай ----
-  yukkiAvatar.addEventListener("click", () => {
-    barkBtn.click();
-  });
+// ---- Клик по аватару - лай ----
+yukkiAvatar.addEventListener("click", () => {
+  barkBtn.click();
+});
 
-  // --------- Рисовалка ---------
-  (() => {
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
+// --------- Рисовалка ---------
+(() => {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-    let drawing = false;
-    let currentStroke = [];
-    let strokes = [];
-    let undoneStrokes = [];
+  let drawing = false;
+  let currentStroke = null;
+  let strokes = [];
+  let undoneStrokes = [];
 
-    let color = "#6B4226"; // коричневый по умолчанию
-    let thickness = 4;
+  let color = "#6B4226"; // коричневый по умолчанию
+  let thickness = 4;
 
-    // Настройки кисти
-    function setStrokeStyle() {
-      ctx.strokeStyle = color;
-      ctx.lineWidth = thickness;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-    }
+  // Настройки кисти
+  function setStrokeStyle() {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+  }
 
-    // Очистить и перерисовать все штрихи
-    function redraw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const stroke of strokes) {
-        ctx.beginPath();
-        ctx.strokeStyle = stroke.color;
-        ctx.lineWidth = stroke.thickness;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-
-        for (let i = 0; i < stroke.points.length; i++) {
-          const p = stroke.points[i];
-          if (i === 0) ctx.moveTo(p.x, p.y);
-          else ctx.lineTo(p.x, p.y);
-        }
-        ctx.stroke();
-      }
-    }
-
-    // Начинаем рисовать новую линию
-    canvas.addEventListener("mousedown", e => {
-      drawing = true;
-      currentStroke = {
-        points: [{ x: e.offsetX, y: e.offsetY }],
-        color,
-        thickness
-      };
-      undoneStrokes = []; // сброс отмен
-    });
-
-    canvas.addEventListener("mousemove", e => {
-      if (!drawing) return;
-      currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
-      redraw();
-      // Рисуем текущую линию
+  // Очистить и перерисовать все штрихи
+  function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const stroke of strokes) {
       ctx.beginPath();
-      ctx.strokeStyle = currentStroke.color;
-      ctx.lineWidth = currentStroke.thickness;
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.thickness;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      const pts = currentStroke.points;
-      ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) {
-        ctx.lineTo(pts[i].x, pts[i].y);
+
+      for (let i = 0; i < stroke.points.length; i++) {
+        const p = stroke.points[i];
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
       }
       ctx.stroke();
-    });
+    }
+  }
 
-    canvas.addEventListener("mouseup", e => {
-      if (!drawing) return;
+  // Начинаем рисовать новую линию
+  canvas.addEventListener("mousedown", e => {
+    drawing = true;
+    currentStroke = {
+      points: [{ x: e.offsetX, y: e.offsetY }],
+      color,
+      thickness
+    };
+    undoneStrokes = []; // сброс отмен
+  });
+
+  canvas.addEventListener("mousemove", e => {
+    if (!drawing) return;
+    currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
+    redraw();
+    // Рисуем текущую линию
+    ctx.beginPath();
+    ctx.strokeStyle = currentStroke.color;
+    ctx.lineWidth = currentStroke.thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const pts = currentStroke.points;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("mouseup", e => {
+    if (!drawing) return;
+    drawing = false;
+    strokes.push(currentStroke);
+    currentStroke = null;
+    redraw();
+  });
+
+  canvas.addEventListener("mouseleave", e => {
+    if (drawing) {
       drawing = false;
-      strokes.push(currentStroke);
-      currentStroke = null;
-      redraw();
-    });
-    canvas.addEventListener("mouseleave", e => {
-      if (drawing) {
-        drawing = false;
-        if (currentStroke) {
-          strokes.push(currentStroke);
-          currentStroke = null;
-          redraw();
-        }
+      if (currentStroke) {
+        strokes.push(currentStroke);
+        currentStroke = null;
+        redraw();
       }
-    });
+    }
+  });
 
-    // Выбор цвета
-    document.querySelectorAll(".color-btn").forEach(btn => {
+  // 20 цветов для рисования
+  const colors = [
+    "#6B4226", "#8B4513", "#A0522D", "#D2691E", "#CD853F",
+    "#F4A460", "#DEB887", "#FFE4C4", "#FF7F50", "#FF6347",
+    "#D2B48C", "#BC8F8F", "#8B0000", "#800000", "#A52A2A",
+    "#B22222", "#CD5C5C", "#F08080", "#FA8072", "#E9967A"
+  ];
+
+  // Создаём кнопки цветов динамически и вставляем их в #colorPicker
+  const colorPicker = document.getElementById("colorPicker");
+  if (colorPicker) {
+    colors.forEach(c => {
+      const btn = document.createElement("button");
+      btn.className = "color-btn";
+      btn.style.backgroundColor = c;
+      btn.dataset.color = c;
+      btn.title = c;
+      btn.type = "button";
+      btn.style.width = "28px";
+      btn.style.height = "28px";
+      btn.style.border = "2px solid transparent";
+      btn.style.borderRadius = "50%";
+      btn.style.margin = "3px";
+      btn.style.cursor = "pointer";
+
       btn.addEventListener("click", () => {
-        color = btn.dataset.color;
+        color = c;
         setStrokeStyle();
 
         // выделяем кнопку
-        document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
-        btn.classList.add("selected");
+        document.querySelectorAll(".color-btn").forEach(b => b.style.border = "2px solid transparent");
+        btn.style.border = "2px solid black";
       });
-    });
 
-    // Выбор толщины
-    document.getElementById("thicknessSelect").addEventListener("change", e => {
+      colorPicker.appendChild(btn);
+    });
+    // Выделяем по умолчанию первый цвет
+    const firstBtn = colorPicker.querySelector("button.color-btn");
+    if (firstBtn) firstBtn.style.border = "2px solid black";
+  }
+
+  // Выбор толщины
+  const thicknessSelect = document.getElementById("thicknessSelect");
+  if (thicknessSelect) {
+    thicknessSelect.addEventListener("change", e => {
       thickness = +e.target.value;
       setStrokeStyle();
     });
+  }
 
-    // Undo
-    document.getElementById("undoBtn").addEventListener("click", () => {
+  // Undo
+  const undoBtn = document.getElementById("undoBtn");
+  if (undoBtn) {
+    undoBtn.addEventListener("click", () => {
       if (strokes.length === 0) return;
       const last = strokes.pop();
       undoneStrokes.push(last);
       redraw();
     });
-    // Redo
-    document.getElementById("redoBtn").addEventListener("click", () => {
+  }
+
+  // Redo
+  const redoBtn = document.getElementById("redoBtn");
+  if (redoBtn) {
+    redoBtn.addEventListener("click", () => {
       if (undoneStrokes.length === 0) return;
       const stroke = undoneStrokes.pop();
       strokes.push(stroke);
       redraw();
     });
+  }
 
-    setStrokeStyle();
-  })();
-</script>
-
-</body>
-</html>
+  setStrokeStyle();
+})();
