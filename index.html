@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Юкки — самая милая чихуахуа 🐶</title>
+<title>Yukki</title>
 <style>
   :root {
     --day-bg: #FAE3D3;
@@ -30,22 +30,6 @@
   body.night {
     background-color: var(--night-bg);
     color: var(--text-night);
-  }
-  /* Фон с движущимися облаками */
-  #clouds {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    background:
-      url("https://i.ibb.co/NxqJ4hr/cloud1.png") repeat-x 0 20px,
-      url("https://i.ibb.co/3fJzTfP/cloud2.png") repeat-x 0 80px;
-    background-size: 300px 80px, 200px 50px;
-    animation: moveClouds 60s linear infinite;
-    z-index: -1;
-  }
-  @keyframes moveClouds {
-    0% {background-position: 0 20px, 0 80px;}
-    100% {background-position: 600px 20px, 400px 80px;}
   }
   header {
     padding: 30px 10px 10px;
@@ -192,8 +176,14 @@
     cursor: pointer;
     user-select: none;
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, opacity 0.3s;
     z-index: 120;
+    opacity: 0;
+    pointer-events: none;
+  }
+  #btnUp.visible {
+    opacity: 1;
+    pointer-events: auto;
   }
   #btnUp:hover {
     background-color: #e88ebd;
@@ -232,10 +222,9 @@
 <body class="day loading">
 
   <div id="loader"><div class="paw-icon">🐾</div></div>
-  <div id="clouds"></div>
 
   <header>
-    <h1>Юкки — самая милая чихуахуа 🐶</h1>
+    <h1>Yukki</h1>
   </header>
 
   <main class="card">
@@ -266,7 +255,7 @@
       </div>
       <div class="gallery-item">
         <img src="paw.jfif" alt="Лапка Юкки" />
-        <div class="caption">Юккина лапка </div>
+        <div class="caption">Юккина лапка 🤣</div>
       </div>
       <div class="gallery-item">
         <img src="sitting.jpg" alt="Юкки очень мило сидит" />
@@ -372,7 +361,7 @@
   avatar.addEventListener("keydown", (e) => {
     if(e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      alert("гав-гав 💖");
+      avatar.click();
     }
   });
 
@@ -380,6 +369,13 @@
   const btnUp = document.getElementById("btnUp");
   btnUp.addEventListener("click", () => {
     window.scrollTo({top: 0, behavior: "smooth"});
+  });
+  window.addEventListener("scroll", () => {
+    if(window.scrollY > 100) {
+      btnUp.classList.add("visible");
+    } else {
+      btnUp.classList.remove("visible");
+    }
   });
 
   // Счётчик возраста Юкки
@@ -394,7 +390,7 @@
     return {years, months};
   }
   function updateAgeCounter() {
-    const birthDate = new Date(2021, 2, 1); // Март - 2, т.к. месяцы с 0 считаются
+    const birthDate = new Date(2021, 2, 1); // Март - 2 (0-indexed)
     const age = calculateAge(birthDate);
     const ageText = `Возраст: ${age.years} ${age.years === 1 ? "год" : "года"}, ${age.months} ${age.months === 1 ? "месяц" : "месяцев"}`;
     document.getElementById("ageCounter").textContent = ageText;
@@ -402,5 +398,6 @@
   updateAgeCounter();
 
 </script>
+
 </body>
 </html>
