@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Юкки — самая милая чихуахуа</title>
+  <style>
+    :root {
+      --day-bg: #FAE3D3;
+      --night-bg: #2D2D40;
+      --day-text: #333;
+      --night-text: #FBE9D3;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    .day {
+      background: var(--day-bg);
+      color: var(--day-text);
+    }
+
+    .night {
+      background: var(--night-bg);
+      color: var(--night-text);
+    }
+
+    header {
+      padding: 30px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .night .card {
+      background: #3D3D5A;
+    }
+
+    img {
+      max-width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    p {
+      font-size: 1.2em;
+      margin: 15px 0;
+    }
+
+    .paw-btn {
+      background: #FFAACB;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+
+    .paw-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .paw {
+      font-size: 3em;
+      display: none;
+      margin-top: 15px;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    /* милые сердечки */
+    body::after {
+      content: "💖 💕 💗 💘 🐾 💓 💝";
+      position: fixed;
+      bottom: 5px;
+      right: 10px;
+      font-size: 1.2em;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>Привет, я Юкки! 🐶</h1>
+    </header>
+
+    <div class="card">
+      <img src="https://ссылка_на_фото_юкки.jpg" alt="Юкки">
+      <p>Я чихуахуа, мне 3 года. Люблю вкусняшки, играть и выполнять команды! 🐾</p>
+      <button class="paw-btn" onclick="showPaw()">Дай лапу!</button>
+      <div class="paw" id="paw">🐾</div>
+    </div>
+
+    <footer>
+      © 2025 Юкки. Самая лучшая собачка на свете 💖
+    </footer>
+  </div>
+
+  <script>
+    // Показать лапу
+    function showPaw() {
+      const paw = document.getElementById('paw');
+      paw.style.display = 'block';
+      setTimeout(() => paw.style.display = 'none', 2000);
+    }
+
+    // Автоматическая смена темы (день/ночь)
+    const hour = new Date().getHours();
+    if (hour >= 19 || hour < 7) {
+      document.body.classList.add('night');
+    } else {
+      document.body.classList.add('day');
+    }
+  </script>
+</body>
+</html>
