@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki </title>
+<title>Yukki — самая милая чихуахуа</title>
 <style>
   body {
     margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,7 +14,7 @@
   #container {
     max-width: 700px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1rem 3rem 1rem;
     text-align: center;
   }
   #title {
@@ -97,12 +97,8 @@
     box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
     transition: background 0.3s ease;
   }
-  button:hover:not(:disabled) {
+  button:hover {
     background: #ff1493;
-  }
-  button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
   }
   select {
     font-size: 1rem;
@@ -135,48 +131,56 @@
   }
 
   /* Рисовалка */
-  #drawingContainer {
+  #drawingSection {
+    border: 2px solid #ff69b4;
+    border-radius: 15px;
+    padding: 1rem;
     margin-top: 2rem;
-    border: 3px solid #ff69b4;
-    background: #fff0f6;
-    border-radius: 12px;
-    padding: 12px;
+    background: #fff0f5;
     user-select: none;
   }
-  #drawingTitle {
-    font-weight: 700;
-    margin-bottom: 8px;
-    font-size: 1.3rem;
-  }
-  #poseHint {
-    font-style: italic;
-    margin-bottom: 12px;
-    font-size: 1rem;
-  }
   #canvas {
-    border: 2px solid #ff69b4;
-    border-radius: 8px;
-    touch-action: none; /* Чтобы не скроллить при рисовании на тач */
-    background: #fff0f6;
+    border: 1px solid #ff69b4;
+    border-radius: 10px;
+    background: white;
     display: block;
-    margin: 0 auto 1rem;
+    margin: 0 auto;
+    cursor: crosshair;
   }
-  #drawControls {
+  #drawingControls {
+    margin-top: 1rem;
     display: flex;
     justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
   }
-  #colorPicker {
-    width: 40px;
-    height: 40px;
+  .color-btn {
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
-    border: 2px solid #ff69b4;
+    border: 2px solid transparent;
+    cursor: pointer;
+    box-shadow: 0 0 3px rgba(0,0,0,0.2);
+  }
+  .color-btn.selected {
+    border-color: #ff1493;
+    box-shadow: 0 0 8px #ff1493;
+  }
+  #thicknessSelect {
+    font-size: 1rem;
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
     cursor: pointer;
   }
-  #brushSizeInput {
-    width: 80px;
+  #undoBtn, #redoBtn {
+    font-size: 1.5rem;
+    padding: 5px 15px;
+    background: #ff1493;
+    user-select: none;
+  }
+  #undoBtn:hover, #redoBtn:hover {
+    background: #ff69b4;
   }
 </style>
 </head>
@@ -246,19 +250,28 @@
   <button id="toTopBtn" title="Наверх">🠕</button>
 
   <!-- Рисовалка -->
-  <div id="drawingContainer">
-    <div id="drawingTitle">Рисовалка Юкки</div>
-    <div id="poseHint"><span>Попробуй нарисовать:</span> <span id="poseText">даёт лапу</span></div>
-    <canvas id="canvas" width="600" height="400" aria-label="Рисовалка Юкки"></canvas>
-    <div id="drawControls">
-      <input type="color" id="colorPicker" title="Выбери цвет кисти" value="#ff69b4" />
-      <input type="range" id="brushSizeInput" min="1" max="20" value="5" title="Толщина кисти" />
-      <button id="undoBtn" title="Отменить ←">←</button>
-      <button id="redoBtn" title="Вернуть →">→</button>
-      <button id="clearBtn" title="Очистить холст">Очистить</button>
-      <button id="nextPoseBtn" title="Следующая поза">Следующая поза</button>
+  <section id="drawingSection">
+    <h2>Рисовалка с Юкки</h2>
+    <canvas id="canvas" width="600" height="400" title="Рисуй с Юкки!"></canvas>
+    <div id="drawingControls">
+      <div id="colorButtons">
+        <button class="color-btn selected" data-color="#6B4226" title="Коричневый (глаза Юкки)" style="background:#6B4226"></button>
+        <button class="color-btn" data-color="#FF69B4" title="Розовый" style="background:#FF69B4"></button>
+        <button class="color-btn" data-color="#000000" title="Чёрный" style="background:#000000"></button>
+        <button class="color-btn" data-color="#4169E1" title="Голубой" style="background:#4169E1"></button>
+        <button class="color-btn" data-color="#8A2BE2" title="Фиолетовый" style="background:#8A2BE2"></button>
+      </div>
+      <select id="thicknessSelect" title="Толщина кисти">
+        <option value="2">2 px</option>
+        <option value="4" selected>4 px</option>
+        <option value="6">6 px</option>
+        <option value="8">8 px</option>
+        <option value="10">10 px</option>
+      </select>
+      <button id="undoBtn" title="Отменить (←)">←</button>
+      <button id="redoBtn" title="Вперёд (→)">→</button>
     </div>
-  </div>
+  </section>
 </div>
 
 <!-- Аудио -->
@@ -268,8 +281,6 @@
 <audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop preload="auto"></audio>
 
 <script>
-(() => {
-  // Тексты на 3 языках
   const texts = {
     ru: {
       greeting: "Привет! Я Юкки — самая милая чихуахуа! 💖",
@@ -300,15 +311,6 @@
         day: "День",
         night: "Ночь",
         pink: "Розовая"
-      },
-      drawTexts: {
-        title: "Рисовалка Юкки",
-        tryDraw: "Попробуй нарисовать:",
-        clear: "Очистить",
-        next: "Следующая поза",
-        undo: "←",
-        redo: "→",
-        poses: ["даёт лапу", "сидит", "лежит", "в засаде", "атакуй"]
       }
     },
     uk: {
@@ -340,15 +342,6 @@
         day: "День",
         night: "Ніч",
         pink: "Рожева"
-      },
-      drawTexts: {
-        title: "Розмальовка Юккі",
-        tryDraw: "Спробуй намалювати:",
-        clear: "Очистити",
-        next: "Наступна поза",
-        undo: "←",
-        redo: "→",
-        poses: ["дає лапу", "сидить", "лежить", "в засаді", "атакуй"]
       }
     },
     en: {
@@ -380,20 +373,12 @@
         day: "Day",
         night: "Night",
         pink: "Pink"
-      },
-      drawTexts: {
-        title: "Yukki Drawing",
-        tryDraw: "Try to draw:",
-        clear: "Clear",
-        next: "Next pose",
-        undo: "←",
-        redo: "→",
-        poses: ["give paw", "sitting", "lying", "in ambush", "attack"]
       }
     }
   };
 
-  // Элементы
+  // ---- Языки и интерфейс ----
+
   const factsBox = document.getElementById("factsBox");
   const barkBtn = document.getElementById("barkBtn");
   const meowBtn = document.getElementById("meowBtn");
@@ -403,320 +388,227 @@
   const toTopBtn = document.getElementById("toTopBtn");
   const yukkiAvatar = document.getElementById("yukkiAvatar");
 
-  // Звуки
   const barkSound1 = document.getElementById("barkSound1");
   const barkSound2 = document.getElementById("barkSound2");
   const meowSound = document.getElementById("meowSound");
   const bgMusic = document.getElementById("bgMusic");
 
-  // Рисовалка элементы
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-  const colorPicker = document.getElementById("colorPicker");
-  const brushSizeInput = document.getElementById("brushSizeInput");
-  const undoBtn = document.getElementById("undoBtn");
-  const redoBtn = document.getElementById("redoBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const poseText = document.getElementById("poseText");
-  const nextPoseBtn = document.getElementById("nextPoseBtn");
+  let isMusicOn = false;
 
-  // Переменные
-  let barkToggle = true;
-  let currentLanguage = "ru";
-  let factsIndex = 0;
-  let currentFacts = texts[currentLanguage].facts;
+  function updateTexts(lang) {
+    const t = texts[lang];
+    document.getElementById("title").textContent = "Yukki";
+    document.getElementById("greeting").textContent = t.greeting;
 
-  // Рисовалка Undo/Redo
-  let drawing = false;
-  let currentStroke = [];
-  let strokes = [];
-  let undoneStrokes = [];
-
-  // Поза для рисовалки
-  let poseIndex = 0;
-
-  // Цвета, включая коричневый для глаз Юкки
-  // Добавим кнопку выбора цвета с коричневым по умолчанию
-  const defaultColors = {
-    ru: "#ff69b4",
-    uk: "#ff69b4",
-    en: "#ff69b4"
-  };
-
-  // Функция смены языка
-  function changeLanguage(lang) {
-    currentLanguage = lang;
-    document.getElementById("greeting").textContent = texts[lang].greeting;
-
-    for (const id in texts[lang].captions) {
+    // подписи
+    for (const id in t.captions) {
       const el = document.getElementById(id);
-      if (el) el.textContent = texts[lang].captions[id];
+      if (el) el.textContent = t.captions[id];
     }
 
-    barkBtn.textContent = texts[lang].buttons.bark;
-    meowBtn.textContent = texts[lang].buttons.meow;
+    // факты (показываем первый факт как подсказку)
+    if (t.facts && t.facts.length > 0) {
+      factsBox.textContent = t.facts[0];
+    }
 
-    themeSelector.options[0].text = texts[lang].buttons.day;
-    themeSelector.options[1].text = texts[lang].buttons.night;
-    themeSelector.options[2].text = texts[lang].buttons.pink;
+    // кнопки
+    barkBtn.textContent = t.buttons.bark;
+    meowBtn.textContent = t.buttons.meow;
 
-    factsIndex = 0;
-    currentFacts = texts[lang].facts;
-    factsBox.textContent = currentFacts[factsIndex];
-
-    // Рисовалка - текст и цвет по умолчанию
-    poseIndex = 0;
-    poseText.textContent = texts[lang].drawTexts.poses[poseIndex];
-    nextPoseBtn.textContent = texts[lang].drawTexts.next;
-    clearBtn.textContent = texts[lang].drawTexts.clear;
-    undoBtn.textContent = texts[lang].drawTexts.undo;
-    redoBtn.textContent = texts[lang].drawTexts.redo;
-    document.getElementById("drawingTitle").textContent = texts[lang].drawTexts.title;
-
-    // Цвет кисти — коричневый для карих глаз Юкки (пример #5D3A1A)
-    colorPicker.value = "#5D3A1A";
+    // темы
+    themeSelector.options[0].text = t.buttons.day;
+    themeSelector.options[1].text = t.buttons.night;
+    themeSelector.options[2].text = t.buttons.pink;
   }
 
-  // Смена темы
-  function changeTheme(theme) {
-    if(theme === "night") {
-      document.body.style.background = "#1e1e2f";
-      document.body.style.color = "#dcdcdc";
-    } else if(theme === "pink") {
-      document.body.style.background = "#ffe4e1";
-      document.body.style.color = "#333";
-    } else {
-      document.body.style.background = "#f5f5f5";
-      document.body.style.color = "#333";
-    }
-  }
-
-  // Цикл фактов с плавным переходом
-  setInterval(() => {
-    factsIndex = (factsIndex + 1) % currentFacts.length;
-    factsBox.style.opacity = 0;
-    setTimeout(() => {
-      factsBox.textContent = currentFacts[factsIndex];
-      factsBox.style.opacity = 1;
-    }, 500);
-  }, 10000);
-
-  // Звуки гавканья по очереди
-  barkBtn.addEventListener("click", () => {
-    if (barkToggle) {
-      barkSound1.currentTime = 0;
-      barkSound1.play();
-    } else {
-      barkSound2.currentTime = 0;
-      barkSound2.play();
-    }
-    barkToggle = !barkToggle;
+  languageSelector.addEventListener("change", e => {
+    updateTexts(e.target.value);
   });
 
+  // Запускаем изначально
+  updateTexts(languageSelector.value);
+
+  // ---- Тема ----
+  function setTheme(theme) {
+    if (theme === "day") {
+      document.body.style.background = "#ffe4e1";
+      document.body.style.color = "#333";
+    } else if (theme === "night") {
+      document.body.style.background = "#1a1a2e";
+      document.body.style.color = "#eee";
+    } else if (theme === "pink") {
+      document.body.style.background = "#ffc0cb";
+      document.body.style.color = "#5a005a";
+    }
+  }
+  themeSelector.addEventListener("change", e => {
+    setTheme(e.target.value);
+  });
+  setTheme(themeSelector.value);
+
+  // ---- Звук ----
+  barkBtn.addEventListener("click", () => {
+    // проигрываем рандомный лай
+    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
+    sound.currentTime = 0;
+    sound.play();
+  });
   meowBtn.addEventListener("click", () => {
     meowSound.currentTime = 0;
     meowSound.play();
   });
 
   musicToggle.addEventListener("click", () => {
-    if (bgMusic.paused) {
-      bgMusic.play();
-      musicToggle.textContent = "🔊";
-    } else {
+    if (isMusicOn) {
       bgMusic.pause();
-      musicToggle.textContent = "🔈";
+      isMusicOn = false;
+      musicToggle.textContent = "🔇";
+    } else {
+      bgMusic.play();
+      isMusicOn = true;
+      musicToggle.textContent = "🔊";
     }
   });
 
-  languageSelector.addEventListener("change", (e) => {
-    changeLanguage(e.target.value);
-  });
-
-  themeSelector.addEventListener("change", (e) => {
-    changeTheme(e.target.value);
-  });
-
+  // ---- Кнопка Наверх ----
   window.addEventListener("scroll", () => {
-    if(window.scrollY > 150) {
+    if (window.scrollY > 100) {
       toTopBtn.classList.add("show");
     } else {
       toTopBtn.classList.remove("show");
     }
   });
-
   toTopBtn.addEventListener("click", () => {
-    window.scrollTo({top: 0, behavior: "smooth"});
+    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
+  // ---- Клик по аватару - лай ----
   yukkiAvatar.addEventListener("click", () => {
-    alert(texts[currentLanguage].buttons.bark + " 💖");
+    barkBtn.click();
   });
 
-  // Рисовалка - функции
+  // --------- Рисовалка ---------
+  (() => {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-  function startDrawing(e) {
-    drawing = true;
-    currentStroke = [];
-    const pos = getMousePos(e);
-    currentStroke.push(pos);
-    drawPoint(pos.x, pos.y);
-  }
+    let drawing = false;
+    let currentStroke = [];
+    let strokes = [];
+    let undoneStrokes = [];
 
-  function drawPoint(x, y) {
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  }
+    let color = "#6B4226"; // коричневый по умолчанию
+    let thickness = 4;
 
-  function drawLine(from, to) {
-    ctx.beginPath();
-    ctx.moveTo(from.x, from.y);
-    ctx.lineTo(to.x, to.y);
-    ctx.stroke();
-    ctx.closePath();
-  }
-
-  function drawStroke(stroke) {
-    if(stroke.length < 2) return;
-    ctx.beginPath();
-    ctx.moveTo(stroke[0].x, stroke[0].y);
-    for(let i=1; i<stroke.length; i++) {
-      ctx.lineTo(stroke[i].x, stroke[i].y);
+    // Настройки кисти
+    function setStrokeStyle() {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = thickness;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
     }
-    ctx.stroke();
-  }
 
-  function getMousePos(e) {
-    const rect = canvas.getBoundingClientRect();
-    let x, y;
-    if (e.touches) {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
-    } else {
-      x = e.clientX - rect.left;
-      y = e.clientY - rect.top;
+    // Очистить и перерисовать все штрихи
+    function redraw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const stroke of strokes) {
+        ctx.beginPath();
+        ctx.strokeStyle = stroke.color;
+        ctx.lineWidth = stroke.thickness;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        for (let i = 0; i < stroke.points.length; i++) {
+          const p = stroke.points[i];
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+        ctx.stroke();
+      }
     }
-    return {x, y};
-  }
 
-  function stopDrawing(e) {
-    if (!drawing) return;
-    drawing = false;
-    if(currentStroke.length > 0) {
-      strokes.push({
-        points: currentStroke,
-        color: ctx.strokeStyle,
-        size: ctx.lineWidth
-      });
-      undoneStrokes = [];
-      updateUndoRedoButtons();
-    }
-  }
+    // Начинаем рисовать новую линию
+    canvas.addEventListener("mousedown", e => {
+      drawing = true;
+      currentStroke = {
+        points: [{ x: e.offsetX, y: e.offsetY }],
+        color,
+        thickness
+      };
+      undoneStrokes = []; // сброс отмен
+    });
 
-  function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for(const stroke of strokes) {
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.size;
-      drawStroke(stroke.points);
-    }
-  }
-
-  function undo() {
-    if(strokes.length === 0) return;
-    undoneStrokes.push(strokes.pop());
-    redraw();
-    updateUndoRedoButtons();
-  }
-
-  function redo() {
-    if(undoneStrokes.length === 0) return;
-    strokes.push(undoneStrokes.pop());
-    redraw();
-    updateUndoRedoButtons();
-  }
-
-  function clearCanvas() {
-    strokes = [];
-    undoneStrokes = [];
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    updateUndoRedoButtons();
-  }
-
-  function updateUndoRedoButtons() {
-    undoBtn.disabled = strokes.length === 0;
-    redoBtn.disabled = undoneStrokes.length === 0;
-  }
-
-  function nextPose() {
-    poseIndex = (poseIndex + 1) % texts[currentLanguage].drawTexts.poses.length;
-    poseText.textContent = texts[currentLanguage].drawTexts.poses[poseIndex];
-  }
-
-  // Обновление цвета и размера кисти
-  function updateBrushSettings() {
-    ctx.strokeStyle = colorPicker.value;
-    ctx.lineWidth = brushSizeInput.value;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-  }
-
-  // Инициализация рисовалки
-  function initDrawing() {
-    updateBrushSettings();
-    updateUndoRedoButtons();
-
-    canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mousemove", (e) => {
+    canvas.addEventListener("mousemove", e => {
       if (!drawing) return;
-      const pos = getMousePos(e);
-      currentStroke.push(pos);
-      ctx.lineTo(pos.x, pos.y);
+      currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
+      redraw();
+      // Рисуем текущую линию
+      ctx.beginPath();
+      ctx.strokeStyle = currentStroke.color;
+      ctx.lineWidth = currentStroke.thickness;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      const pts = currentStroke.points;
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
       ctx.stroke();
     });
-    canvas.addEventListener("mouseup", stopDrawing);
-    canvas.addEventListener("mouseout", stopDrawing);
 
-    // Для тачскринов
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-      startDrawing(e);
-    }, {passive: false});
-    canvas.addEventListener("touchmove", (e) => {
-      e.preventDefault();
+    canvas.addEventListener("mouseup", e => {
       if (!drawing) return;
-      const pos = getMousePos(e);
-      currentStroke.push(pos);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-    }, {passive: false});
-    canvas.addEventListener("touchend", (e) => {
-      e.preventDefault();
-      stopDrawing(e);
-    }, {passive: false});
-
-    colorPicker.addEventListener("change", () => {
-      ctx.strokeStyle = colorPicker.value;
+      drawing = false;
+      strokes.push(currentStroke);
+      currentStroke = null;
+      redraw();
     });
-    brushSizeInput.addEventListener("input", () => {
-      ctx.lineWidth = brushSizeInput.value;
-    });
-    undoBtn.addEventListener("click", undo);
-    redoBtn.addEventListener("click", redo);
-    clearBtn.addEventListener("click", () => {
-      if(confirm(texts[currentLanguage].drawTexts.clear + "?")) {
-        clearCanvas();
+    canvas.addEventListener("mouseleave", e => {
+      if (drawing) {
+        drawing = false;
+        if (currentStroke) {
+          strokes.push(currentStroke);
+          currentStroke = null;
+          redraw();
+        }
       }
     });
-    nextPoseBtn.addEventListener("click", nextPose);
-  }
 
-  // Старт
-  changeLanguage(currentLanguage);
-  changeTheme(themeSelector.value);
-  musicToggle.textContent = "🔊";
+    // Выбор цвета
+    document.querySelectorAll(".color-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        color = btn.dataset.color;
+        setStrokeStyle();
 
-  initDrawing();
-})();
+        // выделяем кнопку
+        document.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+      });
+    });
+
+    // Выбор толщины
+    document.getElementById("thicknessSelect").addEventListener("change", e => {
+      thickness = +e.target.value;
+      setStrokeStyle();
+    });
+
+    // Undo
+    document.getElementById("undoBtn").addEventListener("click", () => {
+      if (strokes.length === 0) return;
+      const last = strokes.pop();
+      undoneStrokes.push(last);
+      redraw();
+    });
+    // Redo
+    document.getElementById("redoBtn").addEventListener("click", () => {
+      if (undoneStrokes.length === 0) return;
+      const stroke = undoneStrokes.pop();
+      strokes.push(stroke);
+      redraw();
+    });
+
+    setStrokeStyle();
+  })();
 </script>
 
 </body>
