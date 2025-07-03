@@ -83,6 +83,7 @@
     gap: 10px;
     flex-wrap: wrap;
     margin-bottom: 1rem;
+    user-select: none;
   }
   button {
     background: #ff69b4;
@@ -95,7 +96,6 @@
     cursor: pointer;
     box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
     transition: background 0.3s ease;
-    user-select: none;
   }
   button:hover {
     background: #ff1493;
@@ -114,8 +114,8 @@
     background: #ff69b4;
     border: none;
     border-radius: 50%;
-    padding: 10px 14px;
-    font-size: 1.4rem;
+    padding: 12px 16px;
+    font-size: 1.6rem;
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(255, 105, 180, 0.7);
@@ -123,6 +123,7 @@
     pointer-events: none;
     transition: opacity 0.4s ease;
     user-select: none;
+    line-height: 1;
   }
   #toTopBtn.show {
     opacity: 1;
@@ -143,7 +144,7 @@
       <div class="caption" id="capNewYear">Юкки в шапочке эльфа у ёлки</div>
     </div>
     <div class="photo-item">
-      <img src="paw.jfif" alt="Юккина лапка" />
+      <img src="paw.jpg" alt="Юккина лапка" />
       <div class="caption" id="capPaw">Юккина лапка</div>
     </div>
     <div class="photo-item">
@@ -193,7 +194,7 @@
     <button id="musicToggle" title="Включить/выключить музыку">🔊</button>
   </div>
 
-  <button id="toTopBtn" title="Наверх">↑</button>
+  <button id="toTopBtn" title="Наверх">🠕</button>
 </div>
 
 <!-- Аудио -->
@@ -226,7 +227,14 @@
         "Дуже розумна і швидко навчається.",
         "Обожнює гратися з улюбленою іграшкою — їжачком.",
         "Іноді сором’язлива, але дуже добра і лагідна."
-      ]
+      ],
+      buttons: {
+        bark: "Гав-гав!",
+        meow: "Мяу от Юкки",
+        day: "День",
+        night: "Ночь",
+        pink: "Розовая"
+      }
     },
     uk: {
       greeting: "Привіт! Я Юккі — наймиліша чихуахуа! 💖",
@@ -237,11 +245,11 @@
         capWinter: "Стоїть на двох передніх лапах на снігу",
         capCandy: "З цукеркою в зубах (вміє відкривати фантики!)",
         capGlasses: "В окулярах, у яких відбивається Київ 💖",
-        capHat: "Орігамі шапка",
-        capToy: "Best friends forever 🤍"
+        capHat: "Шапка оригамі",
+        capToy: "Найкращі друзі назавжди 🤍"
       },
       facts: [
-        "Народилася 1 березня 2021 року.",
+        "Народилась 1 березня 2021 року.",
         "У неї карі очі.",
         "Пухнастий хвіст із білою китичкою на кінці.",
         "Знає команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
@@ -250,7 +258,14 @@
         "Дуже розумна і швидко навчається.",
         "Обожнює гратися з улюбленою іграшкою — їжачком.",
         "Іноді сором’язлива, але дуже добра і лагідна."
-      ]
+      ],
+      buttons: {
+        bark: "Гав-гав!",
+        meow: "Мяу від Юккі",
+        day: "День",
+        night: "Ніч",
+        pink: "Рожева"
+      }
     },
     en: {
       greeting: "Hi! I'm Yukki — the cutest Chihuahua! 💖",
@@ -274,11 +289,17 @@
         "Very smart and learns quickly.",
         "Loves playing with her favorite toy — a hedgehog.",
         "Sometimes shy, but very kind and gentle."
-      ]
+      ],
+      buttons: {
+        bark: "Bark bark!",
+        meow: "Meow from Yukki",
+        day: "Day",
+        night: "Night",
+        pink: "Pink"
+      }
     }
   };
 
-  // Элементы
   const factsBox = document.getElementById("factsBox");
   const barkBtn = document.getElementById("barkBtn");
   const meowBtn = document.getElementById("meowBtn");
@@ -288,34 +309,41 @@
   const toTopBtn = document.getElementById("toTopBtn");
   const yukkiAvatar = document.getElementById("yukkiAvatar");
 
-  // Аудио
-  const bark1 = document.getElementById("barkSound1");
-  const bark2 = document.getElementById("barkSound2");
-  const meow = document.getElementById("meowSound");
+  const barkSound1 = document.getElementById("barkSound1");
+  const barkSound2 = document.getElementById("barkSound2");
+  const meowSound = document.getElementById("meowSound");
   const bgMusic = document.getElementById("bgMusic");
 
-  // Состояния
   let barkToggle = true;
   let currentLanguage = "ru";
   let factsIndex = 0;
   let currentFacts = texts[currentLanguage].facts;
 
-  // Функции обновления текста на выбранном языке
   function changeLanguage(lang) {
     currentLanguage = lang;
     document.getElementById("greeting").textContent = texts[lang].greeting;
-    // Обновляем подписи к фото
+
+    // Обновляем подписи под фото
     for (const id in texts[lang].captions) {
       const el = document.getElementById(id);
       if (el) el.textContent = texts[lang].captions[id];
     }
-    // Сбрасываем индекс фактов
+
+    // Обновляем кнопки
+    barkBtn.textContent = texts[lang].buttons.bark;
+    meowBtn.textContent = texts[lang].buttons.meow;
+
+    // Обновляем темы
+    themeSelector.options[0].text = texts[lang].buttons.day;
+    themeSelector.options[1].text = texts[lang].buttons.night;
+    themeSelector.options[2].text = texts[lang].buttons.pink;
+
+    // Факты
     factsIndex = 0;
     currentFacts = texts[lang].facts;
     factsBox.textContent = currentFacts[factsIndex];
   }
 
-  // Смена темы
   function changeTheme(theme) {
     if(theme === "night") {
       document.body.style.background = "#1e1e2f";
@@ -339,24 +367,23 @@
     }, 500);
   }, 10000);
 
-  // Звуки при кликах
+  // Звуки гавкают по очереди
   barkBtn.addEventListener("click", () => {
     if (barkToggle) {
-      bark1.currentTime = 0;
-      bark1.play();
+      barkSound1.currentTime = 0;
+      barkSound1.play();
     } else {
-      bark2.currentTime = 0;
-      bark2.play();
+      barkSound2.currentTime = 0;
+      barkSound2.play();
     }
     barkToggle = !barkToggle;
   });
 
   meowBtn.addEventListener("click", () => {
-    meow.currentTime = 0;
-    meow.play();
+    meowSound.currentTime = 0;
+    meowSound.play();
   });
 
-  // Переключатель музыки с правильной иконкой
   musicToggle.addEventListener("click", () => {
     if (bgMusic.paused) {
       bgMusic.play();
@@ -367,19 +394,16 @@
     }
   });
 
-  // Обработка выбора языка
   languageSelector.addEventListener("change", (e) => {
     changeLanguage(e.target.value);
   });
 
-  // Обработка выбора темы
   themeSelector.addEventListener("change", (e) => {
     changeTheme(e.target.value);
   });
 
-  // Кнопка "Наверх"
   window.addEventListener("scroll", () => {
-    if (window.scrollY > 150) {
+    if(window.scrollY > 150) {
       toTopBtn.classList.add("show");
     } else {
       toTopBtn.classList.remove("show");
@@ -387,20 +411,18 @@
   });
 
   toTopBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({top: 0, behavior: "smooth"});
   });
 
-  // Приветствие при клике на аватарку
   yukkiAvatar.addEventListener("click", () => {
-    alert("гав-гав 💖");
+    alert(texts[currentLanguage].buttons.bark + " 💖");
   });
 
-  // Начальная установка
+  // Старт
   changeLanguage(currentLanguage);
   changeTheme(themeSelector.value);
-  // Иконка музыки изначально включена (🔊)
   musicToggle.textContent = "🔊";
-</script>
 
+</script>
 </body>
 </html>
