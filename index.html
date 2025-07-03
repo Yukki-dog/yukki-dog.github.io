@@ -418,31 +418,6 @@
     alert(texts[currentLanguage].buttons.bark + " 💖");
   });
 
-   // Старт
-  changeLanguage(currentLanguage);
-  changeTheme(themeSelector.value);
-  musicToggle.textContent = "🔊";
-</script>
-
-<!-- Вот сюда вставляешь рисовалку -->
-
-<section id="drawSection" style="max-width:700px; margin: 3rem auto 5rem; padding: 1rem; background: #fff0f6; border-radius: 16px; box-shadow: 0 0 10px rgba(255,105,180,0.3);">
-  <h2 id="drawTitle" style="text-align:center; color:#d6336c;">Нарисуй Юкки!</h2>
-  <p id="poseHint" style="text-align:center; font-style: italic; color:#a8326e; margin-bottom: 1rem; font-weight:600;">
-    Попробуй нарисовать: <span id="currentPose">сидит</span>
-  </p>
-  <canvas id="drawCanvas" width="700" height="400" style="background:#fff; border: 2px solid #d6336c; border-radius: 12px; display:block; margin: 0 auto; touch-action:none;"></canvas>
-  
-  <div style="text-align:center; margin-top:1rem;">
-    <button id="clearCanvasBtn" style="background:#d6336c; color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-weight:600;">Очистить холст</button>
-    <button id="nextPoseBtn" style="background:#a8326e; color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-weight:600; margin-left:10px;">Следующая поза</button>
-  </div>
-
-  <div id="colorPalette" style="margin-top:15px; text-align:center;">
-    <!-- Цвета будут тут -->
-  </div>
-</section>
-
 <script>
 (() => {
   // Переводы для рисовалки
@@ -452,13 +427,19 @@
       tryDraw: "Попробуй нарисовать:",
       clear: "Очистить холст",
       next: "Следующая поза",
-      poses: ["сидит", "стоит", "даёт лапу", "лежит на спинке", "гуляет в комбинезоне", "играет с игрушкой", "смотрит в камеру", "засадa"]
+      undo: "Отмена (←)",
+      redo: "Вперёд (→)",
+      brushSize: "Толщина кисти:",
+      poses: ["сидит", "стоит", "даёт лапу", "лежит на спинке", "гуляет в комбинезоне", "играет с игрушкой", "смотрит в камеру", "засада"]
     },
     uk: {
       title: "Намалюй Юккі!",
       tryDraw: "Спробуй намалювати:",
       clear: "Очистити полотно",
       next: "Наступна поза",
+      undo: "Скасувати (←)",
+      redo: "Вперед (→)",
+      brushSize: "Товщина пензля:",
       poses: ["сидить", "стоїть", "дає лапу", "лежить на спинці", "гуляє в комбінезоні", "грається з іграшкою", "дивиться в камеру", "засада"]
     },
     en: {
@@ -466,6 +447,9 @@
       tryDraw: "Try to draw:",
       clear: "Clear canvas",
       next: "Next pose",
+      undo: "Undo (←)",
+      redo: "Redo (→)",
+      brushSize: "Brush size:",
       poses: ["sitting", "standing", "giving paw", "lying on back", "walking in jumpsuit", "playing with toy", "looking at camera", "in ambush"]
     }
   };
@@ -474,7 +458,8 @@
     "#d6336c","#ff6b81","#ff9f89","#ffa94d","#fcc419",
     "#69db7c","#38d9a9","#63e6be","#339af0","#5c7cfa",
     "#7048e8","#be4bdb","#f03e3e","#495057","#343a40",
-    "#212529","#868e96","#dee2e6","#f8f9fa","#ffffff"
+    "#212529","#868e96","#dee2e6","#f8f9fa","#ffffff",
+    "#8B4513" // коричневый
   ];
 
   const canvas = document.getElementById("drawCanvas");
@@ -485,9 +470,97 @@
   const nextPoseBtn = document.getElementById("nextPoseBtn");
   const colorPaletteDiv = document.getElementById("colorPalette");
 
+  // Новые кнопки Undo/Redo
+  const undoBtn = document.createElement("button");
+  const redoBtn = document.createElement("button");
+  undoBtn.id = "undoBtn";
+  redoBtn.id = "redoBtn";
+  undoBtn.style.background = "#a8326e";
+  redoBtn.style.background = "#a8326e";
+  undoBtn.style.color = "white";
+  redoBtn.style.color = "white";
+  undoBtn.style.border = "none";
+  redoBtn.style.border = "none";
+  undoBtn.style.borderRadius = "10px";
+  redoBtn.style.borderRadius = "10px";
+  undoBtn.style.padding = "8px 12px";
+  redoBtn.style.padding = "8px 12px";
+  undoBtn.style.cursor = "pointer";
+  redoBtn.style.cursor = "pointer";
+  undoBtn.style.fontWeight = "600";
+  redoBtn.style.fontWeight = "600";
+
+  undoBtn.textContent = "←";
+  redoBtn.textContent = "→";
+
+  // Вставляем кнопки внизу секции рисовалки, рядом с остальными кнопками
+  const buttonsDiv = clearBtn.parentNode;
+  buttonsDiv.insertBefore(undoBtn, clearBtn);
+  buttonsDiv.insertBefore(redoBtn, clearBtn);
+
+  // Добавим выбор толщины кисти
+  const brushSizeLabel = document.createElement("label");
+  brushSizeLabel.style.marginLeft = "15px";
+  brushSizeLabel.style.color = "#a8326e";
+  brushSizeLabel.style.fontWeight = "600";
+  brushSizeLabel.style.userSelect = "none";
+
+  const brushSizeInput = document.createElement("input");
+  brushSizeInput.type = "range";
+  brushSizeInput.min = 1;
+  brushSizeInput.max = 20;
+  brushSizeInput.value = 3;
+  brushSizeInput.style.verticalAlign = "middle";
+  brushSizeInput.style.marginLeft = "8px";
+  brushSizeInput.style.cursor = "pointer";
+
+  brushSizeLabel.appendChild(document.createTextNode(drawTexts.ru.brushSize));
+  brushSizeLabel.appendChild(brushSizeInput);
+  buttonsDiv.appendChild(brushSizeLabel);
+
   let currentPoseIndex = 0;
-  let currentLanguage = "ru"; // по умолчанию, поменяем ниже
+  let currentLanguage = "ru"; // изменится ниже при смене языка
   let brushColor = paletteColors[0];
+  let brushSize = +brushSizeInput.value;
+
+  // История для undo/redo
+  let history = [];
+  let historyIndex = -1;
+
+  // Сохраняем состояние холста
+  function saveState() {
+    if (historyIndex < history.length - 1) {
+      history = history.slice(0, historyIndex + 1);
+    }
+    history.push(canvas.toDataURL());
+    if (history.length > 50) history.shift();
+    historyIndex = history.length - 1;
+  }
+
+  function restoreState(index) {
+    if (index >= 0 && index < history.length) {
+      let imgData = history[index];
+      let img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = imgData;
+      historyIndex = index;
+    }
+  }
+
+  function undo() {
+    if (historyIndex > 0) {
+      restoreState(historyIndex - 1);
+    }
+  }
+
+  function redo() {
+    if (historyIndex < history.length - 1) {
+      restoreState(historyIndex + 1);
+    }
+  }
 
   // Создаем кнопки цветов
   paletteColors.forEach(color => {
@@ -511,6 +584,10 @@
     drawTitleEl.textContent = texts.title;
     nextPoseBtn.textContent = texts.next;
     clearBtn.textContent = texts.clear;
+    undoBtn.title = texts.undo;
+    redoBtn.title = texts.redo;
+    brushSizeLabel.firstChild.textContent = texts.brushSize;
+    // Исправляем подсказку (чтобы не дублировалось)
     poseHintEl.innerHTML = `${texts.tryDraw} <span id="currentPoseText">${texts.poses[currentPoseIndex]}</span>`;
   }
 
@@ -524,11 +601,19 @@
 
   clearBtn.onclick = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveState();
   };
 
   nextPoseBtn.onclick = () => {
     currentPoseIndex = (currentPoseIndex + 1) % drawTexts[currentLanguage].poses.length;
     updatePose();
+  };
+
+  undoBtn.onclick = undo;
+  redoBtn.onclick = redo;
+
+  brushSizeInput.oninput = () => {
+    brushSize = +brushSizeInput.value;
   };
 
   // Рисование
@@ -556,47 +641,23 @@
     [lastX, lastY] = getXY(e);
   }
   function stopDrawing() {
-    drawing = false;
+    if(drawing) {
+      drawing = false;
+      saveState();
+    }
   }
   function draw(e) {
     if (!drawing) return;
     const [x, y] = getXY(e);
     ctx.strokeStyle = brushColor;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = brushSize;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
 
     ctx.beginPath();
-    ctx.moveTo(lastX, lastY);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    ctx.move
 
-    [lastX, lastY] = [x, y];
-  }
 
-  canvas.addEventListener("mousedown", startDrawing);
-  canvas.addEventListener("mouseup", stopDrawing);
-  canvas.addEventListener("mouseout", stopDrawing);
-  canvas.addEventListener("mousemove", draw);
-
-  canvas.addEventListener("touchstart", startDrawing);
-  canvas.addEventListener("touchend", stopDrawing);
-  canvas.addEventListener("touchcancel", stopDrawing);
-  canvas.addEventListener("touchmove", draw);
-
-  // Связь с глобальным переключателем языка (если он есть)
-  // Предположим, что глобальный селектор имеет id="languageSelector"
-  const globalLangSelector = document.getElementById("languageSelector");
-  if(globalLangSelector) {
-    globalLangSelector.addEventListener("change", (e) => {
-      currentLanguage = e.target.value;
-      currentPoseIndex = 0;
-      updateTexts();
-    });
-  }
-
-  // Инициализация текстов
-  updateTexts();
 
 })();
 </script>
