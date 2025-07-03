@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki</title>
+<title>Yukki — самая милая чихуахуа</title>
 <style>
   body {
     margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,7 +14,7 @@
   #container {
     max-width: 700px;
     margin: 2rem auto;
-    padding: 0 1rem 3rem 1rem;
+    padding: 0 1rem;
     text-align: center;
   }
   #title {
@@ -131,56 +131,39 @@
   }
 
   /* Рисовалка */
-  #drawingSection {
-    border: 2px solid #ff69b4;
-    border-radius: 15px;
-    padding: 1rem;
-    margin-top: 2rem;
-    background: #fff0f5;
-    user-select: none;
-  }
   #canvas {
-    border: 1px solid #ff69b4;
-    border-radius: 10px;
-    background: white;
+    border: 2px solid #ff69b4;
+    border-radius: 12px;
     display: block;
-    margin: 0 auto;
-    cursor: crosshair;
+    margin: 0 auto 1rem auto;
+    touch-action: none;
   }
-  #drawingControls {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+
+  /* Цвета */
   .color-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     border: 2px solid transparent;
     cursor: pointer;
     box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    transition: border-color 0.3s ease;
   }
   .color-btn.selected {
     border-color: #ff1493;
-    box-shadow: 0 0 8px #ff1493;
   }
-  #thicknessSelect {
-    font-size: 1rem;
-    padding: 6px 10px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    cursor: pointer;
+  #colorPalette {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 10px;
   }
-  #undoBtn, #redoBtn {
-    font-size: 1.5rem;
-    padding: 5px 15px;
-    background: #ff1493;
-    user-select: none;
-  }
-  #undoBtn:hover, #redoBtn:hover {
-    background: #ff69b4;
+  #undoRedoControls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
   }
 </style>
 </head>
@@ -247,31 +230,25 @@
     <button id="musicToggle" title="Включить/выключить музыку">🔊</button>
   </div>
 
-  <button id="toTopBtn" title="Наверх">🠕</button>
+  <canvas id="canvas" width="700" height="400" title="Рисовалка Юкки"></canvas>
 
-  <!-- Рисовалка -->
-  <section id="drawingSection">
-    <h2>Рисовалка с Юкки</h2>
-    <canvas id="canvas" width="600" height="400" title="Рисуй с Юкки!"></canvas>
-    <div id="drawingControls">
-      <div id="colorButtons">
-        <button class="color-btn selected" data-color="#6B4226" title="Коричневый (глаза Юкки)" style="background:#6B4226"></button>
-        <button class="color-btn" data-color="#FF69B4" title="Розовый" style="background:#FF69B4"></button>
-        <button class="color-btn" data-color="#000000" title="Чёрный" style="background:#000000"></button>
-        <button class="color-btn" data-color="#4169E1" title="Голубой" style="background:#4169E1"></button>
-        <button class="color-btn" data-color="#8A2BE2" title="Фиолетовый" style="background:#8A2BE2"></button>
-      </div>
-      <select id="thicknessSelect" title="Толщина кисти">
-        <option value="2">2 px</option>
-        <option value="4" selected>4 px</option>
-        <option value="6">6 px</option>
-        <option value="8">8 px</option>
-        <option value="10">10 px</option>
-      </select>
-      <button id="undoBtn" title="Отменить (←)">←</button>
-      <button id="redoBtn" title="Вперёд (→)">→</button>
-    </div>
-  </section>
+  <div id="colorPalette"></div>
+
+  <label for="thicknessSelect">Толщина кисти:</label>
+  <select id="thicknessSelect" title="Выбери толщину кисти">
+    <option value="2">2 px</option>
+    <option value="4" selected>4 px</option>
+    <option value="6">6 px</option>
+    <option value="8">8 px</option>
+    <option value="12">12 px</option>
+  </select>
+
+  <div id="undoRedoControls">
+    <button id="undoBtn" title="Отменить (←)">←</button>
+    <button id="redoBtn" title="Вперёд (→)">→</button>
+  </div>
+
+  <button id="toTopBtn" title="Наверх">🠕</button>
 </div>
 
 <!-- Аудио -->
@@ -377,7 +354,47 @@
     }
   };
 
-  // ---- Языки и интерфейс ----
+  const drawHints = {
+    ru: [
+      "сидит",
+      "лежит",
+      "смотрит в камеру",
+      "дает лапу",
+      "стоит",
+      "стоит на 2 лапах",
+      "лежит на спинке",
+      "только силуэт",
+      "Юкки в комбинезоне",
+      "на фоне ёлки",
+      "на снегу"
+    ],
+    uk: [
+      "сидить",
+      "лежить",
+      "дивиться в камеру",
+      "дає лапу",
+      "стоїть",
+      "стоїть на 2 лапах",
+      "лежить на спинці",
+      "тільки силует",
+      "Юккі в комбінезоні",
+      "на фоні ялинки",
+      "на снігу"
+    ],
+    en: [
+      "sitting",
+      "lying down",
+      "looking at the camera",
+      "giving a paw",
+      "standing",
+      "standing on two paws",
+      "lying on the back",
+      "just silhouette",
+      "Yukki in a jumpsuit",
+      "in front of a Christmas tree",
+      "on the snow"
+    ]
+  };
 
   const factsBox = document.getElementById("factsBox");
   const barkBtn = document.getElementById("barkBtn");
@@ -393,114 +410,52 @@
   const meowSound = document.getElementById("meowSound");
   const bgMusic = document.getElementById("bgMusic");
 
-  let isMusicOn = false;
-
-  function updateTexts(lang) {
-    const t = texts[lang];
-    document.getElementById("title").textContent = "Yukki";
-    document.getElementById("greeting").textContent = t.greeting;
-
-    // подписи
-    for (const id in t.captions) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = t.captions[id];
-    }
-
-    // факты (показываем первый факт как подсказку)
-    if (t.facts && t.facts.length > 0) {
-      factsBox.textContent = t.facts[0];
-    }
-
-    // кнопки
-    barkBtn.textContent = t.buttons.bark;
-    meowBtn.textContent = t.buttons.meow;
-
-    // темы
-    themeSelector.options[0].text = t.buttons.day;
-    themeSelector.options[1].text = t.buttons.night;
-    themeSelector.options[2].text = t.buttons.pink;
-  }
-
-  languageSelector.addEventListener("change", e => {
-    updateTexts(e.target.value);
-  });
-
-  // Запускаем изначально
-  updateTexts(languageSelector.value);
-
-  // ---- Тема ----
-  function setTheme(theme) {
-    if (theme === "day") {
-      document.body.style.background = "#ffe4e1";
-      document.body.style.color = "#333";
-    } else if (theme === "night") {
-      document.body.style.background = "#1a1a2e";
-      document.body.style.color = "#eee";
-    } else if (theme === "pink") {
-      document.body.style.background = "#ffc0cb";
-      document.body.style.color = "#5a005a";
-    }
-  }
-  themeSelector.addEventListener("change", e => {
-    setTheme(e.target.value);
-  });
-  setTheme(themeSelector.value);
-
-  // ---- Звук ----
-  barkBtn.addEventListener("click", () => {
-    // проигрываем рандомный лай
-    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
-    sound.currentTime = 0;
-    sound.play();
-  });
-  meowBtn.addEventListener("click", () => {
-    meowSound.currentTime = 0;
-    meowSound.play();
-  });
-
-  musicToggle.addEventListener("click", () => {
-    if (isMusicOn) {
-      bgMusic.pause();
-      isMusicOn = false;
-      musicToggle.textContent = "🔈";
-    } else {
-      bgMusic.play();
-      isMusicOn = true;
-      musicToggle.textContent = "🔊";
-    }
-  });
-
- // ---- Кнопка Наверх ----
-window.addEventListener("scroll", () => {
-  if (window.scrollY > 100) {
-    toTopBtn.classList.add("show");
-  } else {
-    toTopBtn.classList.remove("show");
-  }
-});
-toTopBtn.addEventListener("click", () => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-// ---- Клик по аватару - лай ----
-yukkiAvatar.addEventListener("click", () => {
-  barkBtn.click();
-});
-
-// --------- Рисовалка ---------
-(() => {
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
 
+  // Рисовалка
   let drawing = false;
   let currentStroke = null;
   let strokes = [];
   let undoneStrokes = [];
 
-  let color = "#6B4226"; // коричневый по умолчанию
+  let color = "#6B4226"; // коричневый
   let thickness = 4;
 
-  // Настройки кисти
+  // Цвета для палитры (20 штук)
+  const colors = [
+    "#6B4226", // коричневый (глаза)
+    "#000000", // чёрный
+    "#FFFFFF", // белый
+    "#FF0000", // красный
+    "#00FF00", // зелёный
+    "#0000FF", // синий
+    "#FFFF00", // жёлтый
+    "#FF69B4", // розовый
+    "#800080", // фиолетовый
+    "#00FFFF", // бирюзовый
+    "#FFA500", // оранжевый
+    "#A52A2A", // коричневый темный
+    "#FFC0CB", // светло-розовый
+    "#ADD8E6", // светло-голубой
+    "#008000", // тёмно-зелёный
+    "#FFD700", // золотой
+    "#4B0082", // индиго
+    "#D2691E", // шоколадный
+    "#808080", // серый
+    "#B22222"  // огненно-красный
+  ];
+
+  // Инициализация палитры
+  const colorPalette = document.getElementById("colorPalette");
+  colors.forEach(c => {
+    const btn = document.createElement("div");
+    btn.className = "color-btn";
+    btn.style.backgroundColor = c;
+    btn.dataset.color = c;
+    colorPalette.appendChild(btn);
+  });
+
   function setStrokeStyle() {
     ctx.strokeStyle = color;
     ctx.lineWidth = thickness;
@@ -508,7 +463,6 @@ yukkiAvatar.addEventListener("click", () => {
     ctx.lineJoin = "round";
   }
 
-  // Очистить и перерисовать все штрихи
   function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (const stroke of strokes) {
@@ -517,17 +471,15 @@ yukkiAvatar.addEventListener("click", () => {
       ctx.lineWidth = stroke.thickness;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-
-      for (let i = 0; i < stroke.points.length; i++) {
-        const p = stroke.points[i];
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
+      const pts = stroke.points;
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
       }
       ctx.stroke();
     }
   }
 
-  // Начинаем рисовать новую линию
   canvas.addEventListener("mousedown", e => {
     drawing = true;
     currentStroke = {
@@ -535,14 +487,14 @@ yukkiAvatar.addEventListener("click", () => {
       color,
       thickness
     };
-    undoneStrokes = []; // сброс отмен
+    undoneStrokes = [];
   });
 
   canvas.addEventListener("mousemove", e => {
     if (!drawing) return;
     currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
     redraw();
-    // Рисуем текущую линию
+    // Рисуем текущую линию поверх
     ctx.beginPath();
     ctx.strokeStyle = currentStroke.color;
     ctx.lineWidth = currentStroke.thickness;
@@ -556,96 +508,136 @@ yukkiAvatar.addEventListener("click", () => {
     ctx.stroke();
   });
 
-  canvas.addEventListener("mouseup", e => {
+  function finishStroke() {
     if (!drawing) return;
     drawing = false;
-    strokes.push(currentStroke);
-    currentStroke = null;
+    if (currentStroke) {
+      strokes.push(currentStroke);
+      currentStroke = null;
+      redraw();
+    }
+  }
+
+  canvas.addEventListener("mouseup", finishStroke);
+  canvas.addEventListener("mouseleave", finishStroke);
+
+  // Выбор цвета
+  colorPalette.querySelectorAll(".color-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      color = btn.dataset.color;
+      setStrokeStyle();
+      colorPalette.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+  });
+  // Выделить первый цвет по умолчанию
+  colorPalette.querySelector(".color-btn").classList.add("selected");
+
+  // Выбор толщины
+  document.getElementById("thicknessSelect").addEventListener("change", e => {
+    thickness = +e.target.value;
+    setStrokeStyle();
+  });
+
+  // Undo
+  document.getElementById("undoBtn").addEventListener("click", () => {
+    if (strokes.length === 0) return;
+    undoneStrokes.push(strokes.pop());
+    redraw();
+  });
+  // Redo
+  document.getElementById("redoBtn").addEventListener("click", () => {
+    if (undoneStrokes.length === 0) return;
+    strokes.push(undoneStrokes.pop());
     redraw();
   });
 
-  canvas.addEventListener("mouseleave", e => {
-    if (drawing) {
-      drawing = false;
-      if (currentStroke) {
-        strokes.push(currentStroke);
-        currentStroke = null;
-        redraw();
-      }
+  setStrokeStyle();
+
+  // Кнопка Наверх
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 100) toTopBtn.classList.add("show");
+    else toTopBtn.classList.remove("show");
+  });
+  toTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // Клик по аватару — лай
+  yukkiAvatar.addEventListener("click", () => {
+    barkBtn.click();
+  });
+
+  // Звуки
+  barkBtn.addEventListener("click", () => {
+    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
+    sound.currentTime = 0;
+    sound.play();
+  });
+  meowBtn.addEventListener("click", () => {
+    meowSound.currentTime = 0;
+    meowSound.play();
+  });
+
+  // Музыка
+  musicToggle.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = "🔈";
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = "🔊";
     }
   });
 
-  // 20 цветов для рисования
-  const colors = [
-    "#6B4226", "#8B4513", "#A0522D", "#D2691E", "#CD853F",
-    "#F4A460", "#DEB887", "#FFE4C4", "#FF7F50", "#FF6347",
-    "#D2B48C", "#BC8F8F", "#8B0000", "#800000", "#A52A2A",
-    "#B22222", "#CD5C5C", "#F08080", "#FA8072", "#E9967A"
-  ];
-
-  // Создаём кнопки цветов динамически и вставляем их в #colorPicker
-  const colorPicker = document.getElementById("colorPicker");
-  if (colorPicker) {
-    colors.forEach(c => {
-      const btn = document.createElement("button");
-      btn.className = "color-btn";
-      btn.style.backgroundColor = c;
-      btn.dataset.color = c;
-      btn.title = c;
-      btn.type = "button";
-      btn.style.width = "28px";
-      btn.style.height = "28px";
-      btn.style.border = "2px solid transparent";
-      btn.style.borderRadius = "50%";
-      btn.style.margin = "3px";
-      btn.style.cursor = "pointer";
-
-      btn.addEventListener("click", () => {
-        color = c;
-        setStrokeStyle();
-
-        // выделяем кнопку
-        document.querySelectorAll(".color-btn").forEach(b => b.style.border = "2px solid transparent");
-        btn.style.border = "2px solid black";
-      });
-
-      colorPicker.appendChild(btn);
-    });
-    // Выделяем по умолчанию первый цвет
-    const firstBtn = colorPicker.querySelector("button.color-btn");
-    if (firstBtn) firstBtn.style.border = "2px solid black";
+  // Переключение языка и текста
+  function updateTexts(lang) {
+    const t = texts[lang];
+    document.getElementById("greeting").textContent = t.greeting;
+    for (const [id, txt] of Object.entries(t.captions)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    }
+    factsBox.textContent = randomFact(lang);
+    barkBtn.textContent = t.buttons.bark;
+    meowBtn.textContent = t.buttons.meow;
+    themeSelector.options[0].text = t.buttons.day;
+    themeSelector.options[1].text = t.buttons.night;
+    themeSelector.options[2].text = t.buttons.pink;
   }
 
-  // Выбор толщины
-  const thicknessSelect = document.getElementById("thicknessSelect");
-  if (thicknessSelect) {
-    thicknessSelect.addEventListener("change", e => {
-      thickness = +e.target.value;
-      setStrokeStyle();
-    });
+  function randomFact(lang) {
+    const arr = texts[lang].facts;
+    return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  // Undo
-  const undoBtn = document.getElementById("undoBtn");
-  if (undoBtn) {
-    undoBtn.addEventListener("click", () => {
-      if (strokes.length === 0) return;
-      const last = strokes.pop();
-      undoneStrokes.push(last);
-      redraw();
-    });
-  }
+  languageSelector.addEventListener("change", e => {
+    updateTexts(e.target.value);
+  });
 
-  // Redo
-  const redoBtn = document.getElementById("redoBtn");
-  if (redoBtn) {
-    redoBtn.addEventListener("click", () => {
-      if (undoneStrokes.length === 0) return;
-      const stroke = undoneStrokes.pop();
-      strokes.push(stroke);
-      redraw();
-    });
-  }
+  updateTexts(languageSelector.value);
 
-  setStrokeStyle();
-})();
+  // Темы
+  themeSelector.addEventListener("change", e => {
+    const val = e.target.value;
+    if (val === "day") {
+      document.body.style.background = "#ffe4e1";
+      document.body.style.color = "#333";
+    } else if (val === "night") {
+      document.body.style.background = "#1a1a2e";
+      document.body.style.color = "#eee";
+    } else if (val === "pink") {
+      document.body.style.background = "#f7c6d0";
+      document.body.style.color = "#601028";
+    }
+  });
+
+  // Показываем новый факт каждые 15 секунд
+  setInterval(() => {
+    factsBox.textContent = randomFact(languageSelector.value);
+  }, 15000);
+
+</script>
+
+</body>
+</html>
