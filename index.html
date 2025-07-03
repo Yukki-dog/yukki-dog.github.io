@@ -604,6 +604,52 @@
     currentStroke = null;
     redraw();
   });
+  // --- Touch-события для рисования на телефонах ---
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault(); // чтобы страница не скроллилась
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    drawing = true;
+    currentStroke = {
+      points: [{ x, y }],
+      color,
+      thickness
+    };
+    undoneStrokes = [];
+  });
+
+  canvas.addEventListener("touchmove", e => {
+    if (!drawing) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    currentStroke.points.push({ x, y });
+    redraw();
+
+    // Отрисовка текущей линии
+    ctx.beginPath();
+    ctx.strokeStyle = currentStroke.color;
+    ctx.lineWidth = currentStroke.thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const pts = currentStroke.points;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("touchend", e => {
+    if (!drawing) return;
+    drawing = false;
+    strokes.push(currentStroke);
+    currentStroke = null;
+    redraw();
+  });
 
   canvas.addEventListener("mouseleave", e => {
     if (drawing) {
