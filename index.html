@@ -655,12 +655,36 @@
     ctx.lineCap = "round";
 
     ctx.beginPath();
-    ctx.move
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
 
+    [lastX, lastY] = [x, y];
+  }
 
+  canvas.onmousedown = startDrawing;
+  canvas.ontouchstart = startDrawing;
+  canvas.onmouseup = stopDrawing;
+  canvas.ontouchend = stopDrawing;
+  canvas.onmouseout = stopDrawing;
+  canvas.ontouchcancel = stopDrawing;
+  canvas.onmousemove = draw;
+  canvas.ontouchmove = draw;
+
+  // Инициализация
+  function init() {
+    updateTexts();
+    saveState();
+  }
+
+  // Запуск
+  init();
+
+  // Для смены языка и темы, если они у тебя уже есть, надо при смене языка тоже обновлять:
+  // currentLanguage = "ru" или "uk" или "en"
+  // updateTexts();
 
 })();
 </script>
-
 </body>
 </html>
