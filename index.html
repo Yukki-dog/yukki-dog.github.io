@@ -418,11 +418,188 @@
     alert(texts[currentLanguage].buttons.bark + " 💖");
   });
 
-  // Старт
+   // Старт
   changeLanguage(currentLanguage);
   changeTheme(themeSelector.value);
   musicToggle.textContent = "🔊";
-
 </script>
+
+<!-- Вот сюда вставляешь рисовалку -->
+
+<section id="drawSection" style="max-width:700px; margin: 3rem auto 5rem; padding: 1rem; background: #fff0f6; border-radius: 16px; box-shadow: 0 0 10px rgba(255,105,180,0.3);">
+  <h2 id="drawTitle" style="text-align:center; color:#d6336c;">Нарисуй Юкки!</h2>
+  <p id="poseHint" style="text-align:center; font-style: italic; color:#a8326e; margin-bottom: 1rem; font-weight:600;">
+    Попробуй нарисовать: <span id="currentPose">сидит</span>
+  </p>
+  <canvas id="drawCanvas" width="700" height="400" style="background:#fff; border: 2px solid #d6336c; border-radius: 12px; display:block; margin: 0 auto; touch-action:none;"></canvas>
+  
+  <div style="text-align:center; margin-top:1rem;">
+    <button id="clearCanvasBtn" style="background:#d6336c; color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-weight:600;">Очистить холст</button>
+    <button id="nextPoseBtn" style="background:#a8326e; color:#fff; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-weight:600; margin-left:10px;">Следующая поза</button>
+  </div>
+
+  <div id="colorPalette" style="margin-top:15px; text-align:center;">
+    <!-- Цвета будут тут -->
+  </div>
+</section>
+
+<script>
+(() => {
+  // Переводы для рисовалки
+  const drawTexts = {
+    ru: {
+      title: "Нарисуй Юкки!",
+      tryDraw: "Попробуй нарисовать:",
+      clear: "Очистить холст",
+      next: "Следующая поза",
+      poses: ["сидит", "стоит", "даёт лапу", "лежит на спинке", "гуляет в комбинезоне", "играет с игрушкой", "смотрит в камеру", "засадa"]
+    },
+    uk: {
+      title: "Намалюй Юккі!",
+      tryDraw: "Спробуй намалювати:",
+      clear: "Очистити полотно",
+      next: "Наступна поза",
+      poses: ["сидить", "стоїть", "дає лапу", "лежить на спинці", "гуляє в комбінезоні", "грається з іграшкою", "дивиться в камеру", "засада"]
+    },
+    en: {
+      title: "Draw Yukki!",
+      tryDraw: "Try to draw:",
+      clear: "Clear canvas",
+      next: "Next pose",
+      poses: ["sitting", "standing", "giving paw", "lying on back", "walking in jumpsuit", "playing with toy", "looking at camera", "in ambush"]
+    }
+  };
+
+  const paletteColors = [
+    "#d6336c","#ff6b81","#ff9f89","#ffa94d","#fcc419",
+    "#69db7c","#38d9a9","#63e6be","#339af0","#5c7cfa",
+    "#7048e8","#be4bdb","#f03e3e","#495057","#343a40",
+    "#212529","#868e96","#dee2e6","#f8f9fa","#ffffff"
+  ];
+
+  const canvas = document.getElementById("drawCanvas");
+  const ctx = canvas.getContext("2d");
+  const poseHintEl = document.getElementById("currentPose");
+  const drawTitleEl = document.getElementById("drawTitle");
+  const clearBtn = document.getElementById("clearCanvasBtn");
+  const nextPoseBtn = document.getElementById("nextPoseBtn");
+  const colorPaletteDiv = document.getElementById("colorPalette");
+
+  let currentPoseIndex = 0;
+  let currentLanguage = "ru"; // по умолчанию, поменяем ниже
+  let brushColor = paletteColors[0];
+
+  // Создаем кнопки цветов
+  paletteColors.forEach(color => {
+    const btn = document.createElement("button");
+    btn.style.background = color;
+    btn.style.width = "28px";
+    btn.style.height = "28px";
+    btn.style.border = "none";
+    btn.style.borderRadius = "50%";
+    btn.style.margin = "3px";
+    btn.style.cursor = "pointer";
+    btn.title = color;
+    btn.onclick = () => {
+      brushColor = color;
+    };
+    colorPaletteDiv.appendChild(btn);
+  });
+
+  function updateTexts() {
+    const texts = drawTexts[currentLanguage];
+    drawTitleEl.textContent = texts.title;
+    nextPoseBtn.textContent = texts.next;
+    clearBtn.textContent = texts.clear;
+    poseHintEl.innerHTML = `${texts.tryDraw} <span id="currentPoseText">${texts.poses[currentPoseIndex]}</span>`;
+  }
+
+  function updatePose() {
+    const texts = drawTexts[currentLanguage];
+    const poseTextEl = document.getElementById("currentPoseText");
+    if(poseTextEl) {
+      poseTextEl.textContent = texts.poses[currentPoseIndex];
+    }
+  }
+
+  clearBtn.onclick = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  nextPoseBtn.onclick = () => {
+    currentPoseIndex = (currentPoseIndex + 1) % drawTexts[currentLanguage].poses.length;
+    updatePose();
+  };
+
+  // Рисование
+  let drawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  function getXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches && e.touches.length) {
+      return [
+        e.touches[0].clientX - rect.left,
+        e.touches[0].clientY - rect.top
+      ];
+    } else {
+      return [
+        e.clientX - rect.left,
+        e.clientY - rect.top
+      ];
+    }
+  }
+
+  function startDrawing(e) {
+    drawing = true;
+    [lastX, lastY] = getXY(e);
+  }
+  function stopDrawing() {
+    drawing = false;
+  }
+  function draw(e) {
+    if (!drawing) return;
+    const [x, y] = getXY(e);
+    ctx.strokeStyle = brushColor;
+    ctx.lineWidth = 3;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    [lastX, lastY] = [x, y];
+  }
+
+  canvas.addEventListener("mousedown", startDrawing);
+  canvas.addEventListener("mouseup", stopDrawing);
+  canvas.addEventListener("mouseout", stopDrawing);
+  canvas.addEventListener("mousemove", draw);
+
+  canvas.addEventListener("touchstart", startDrawing);
+  canvas.addEventListener("touchend", stopDrawing);
+  canvas.addEventListener("touchcancel", stopDrawing);
+  canvas.addEventListener("touchmove", draw);
+
+  // Связь с глобальным переключателем языка (если он есть)
+  // Предположим, что глобальный селектор имеет id="languageSelector"
+  const globalLangSelector = document.getElementById("languageSelector");
+  if(globalLangSelector) {
+    globalLangSelector.addEventListener("change", (e) => {
+      currentLanguage = e.target.value;
+      currentPoseIndex = 0;
+      updateTexts();
+    });
+  }
+
+  // Инициализация текстов
+  updateTexts();
+
+})();
+</script>
+
 </body>
 </html>
