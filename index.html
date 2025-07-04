@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki — самая милая чихуахуа</title>
+<title>Yukki </title>
 <style>
   body {
     margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -749,141 +749,7 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  // === Голосование ===
-  const votingSection = document.getElementById('votingSection');
-  const voteOptionsDiv = document.getElementById('voteOptions');
-  const voteBtn = document.getElementById('voteBtn');
-  const resetVotesBtn = document.getElementById('resetVotesBtn');
-  const resultsDiv = document.getElementById('results');
-  const voteMessageDiv = document.getElementById('voteMessage');
-
-  // Вычислить номер сегодняшнего дня
-  function getTodayDayNumber() {
-    const today = new Date();
-    return today.getDate();
-  }
-
-  // Получить текущую группу голосования по дате
-  function getCurrentVoteGroup() {
-    const day = getTodayDayNumber();
-    // Если день в no-voting - вернуть null
-    if (texts[lang].voteNoVotingDays.includes(day)) return null;
-
-    for (const group of texts[lang].voteGroups) {
-      if (day >= group.range[0] && day <= group.range[1]) return group.options;
-    }
-    return null;
-  }
-
-  // Проверка голосования в localStorage
-  function hasVoted() {
-    // ключ: "vote_<date>_<lang>"
-    const day = getTodayDayNumber();
-    return localStorage.getItem(`vote_${day}_${lang}`) !== null;
-  }
-
-  // Сохранить голос в localStorage
-  function saveVote(option) {
-    const day = getTodayDayNumber();
-    localStorage.setItem(`vote_${day}_${lang}`, option);
-  }
-
-  // Загрузить все голоса с localStorage (просто для демонстрации)
-  // В реальности будет сложно собрать голоса от всех устройств, так что это пример!
-  // Здесь просто считаем сколько раз кто голосовал на этом устройстве.
-  // Можно сделать просто счетчик по текущему клиенту.
-  function getVotesCount() {
-    // Возвращаем объект с подсчётом голосов пользователя (1 или 0)
-    // Для теста просто 1 за выбранный вариант
-    const day = getTodayDayNumber();
-    const vote = localStorage.getItem(`vote_${day}_${lang}`);
-    const options = getCurrentVoteGroup();
-    if (!options) return {};
-    const counts = {};
-    options.forEach(o => counts[o] = 0);
-    if (vote && counts.hasOwnProperty(vote)) counts[vote] = 1;
-    return counts;
-  }
-
-  // Обновить отображение вариантов голосования
-  function buildVotingSection() {
-    const options = getCurrentVoteGroup();
-    voteOptionsDiv.innerHTML = '';
-    resultsDiv.innerHTML = '';
-    voteMessageDiv.textContent = texts[lang].voteMessage;
-
-    if (!options) {
-      voteOptionsDiv.innerHTML = `<p><em>Голосования нет сегодня.</em></p>`;
-      voteBtn.disabled = true;
-      resetVotesBtn.style.display = 'none';
-      voteMessageDiv.textContent = '';
-      return;
-    }
-
-    // Создаём радио кнопки для вариантов
-    options.forEach((opt, i) => {
-      const label = document.createElement('label');
-      label.className = 'vote-option';
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = 'voteOption';
-      input.value = opt;
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(opt));
-      voteOptionsDiv.appendChild(label);
-    });
-
-    // Если пользователь уже голосовал — блокируем кнопку и показываем сообщение
-    if (hasVoted()) {
-      voteBtn.disabled = true;
-      voteMessageDiv.textContent = texts[lang].voteAlready;
-      showResults();
-    } else {
-      voteBtn.disabled = false;
-      voteMessageDiv.textContent = texts[lang].voteMessage;
-    }
-
-    resetVotesBtn.style.display = 'inline-block';
-  }
-
-  // Показать результаты голосования (по данным localStorage)
-  function showResults() {
-    const counts = getVotesCount();
-    if (Object.keys(counts).length === 0) {
-      resultsDiv.textContent = '';
-      return;
-    }
-    let resultsText = texts[lang].resultsTitle + ': ';
-    const parts = [];
-    for (const [opt, cnt] of Object.entries(counts)) {
-      parts.push(`${opt}: ${cnt}`);
-    }
-    resultsDiv.textContent = parts.join(', ');
-  }
-
-  voteBtn.addEventListener('click', () => {
-    const selected = document.querySelector('input[name="voteOption"]:checked');
-    if (!selected) {
-      voteMessageDiv.textContent = texts[lang].voteChooseOption;
-      return;
-    }
-    if (hasVoted()) {
-      voteMessageDiv.textContent = texts[lang].voteAlready;
-      return;
-    }
-    saveVote(selected.value);
-    voteMessageDiv.textContent = texts[lang].voteThanks;
-    voteBtn.disabled = true;
-    showResults();
-  });
-
-  resetVotesBtn.addEventListener('click', () => {
-    // Удаляем голос пользователя только для теста
-    const day = getTodayDayNumber();
-    localStorage.removeItem(`vote_${day}_${lang}`);
-    voteMessageDiv.textContent = '';
-    buildVotingSection();
-  });
+  
 
   // Инициализация текста
   updateTexts();
@@ -897,6 +763,9 @@
   const barkSound2 = document.getElementById('barkSound2');
   const meowSound = document.getElementById('meowSound');
 
+  <!-- ... -->
+
+<script>
   // Кнопка "Гав-гав!"
   document.getElementById('barkBtn').addEventListener('click', () => {
     const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
@@ -909,13 +778,36 @@
     meowSound.currentTime = 0;
     meowSound.play();
   });
-
-  // === Аватар Юкки — гавкать при клике ===
-  const yukkiAvatar = document.getElementById('yukkiAvatar');
-  yukkiAvatar.addEventListener('click', () => {
-    barkBtn.click();
-  });
 </script>
+
+<!-- 🐾 Кликер Юкки -->
+<section id="yukki-clicker" style="text-align:center; padding:30px 0;">
+  <img id="clickerYukki" src="yukki_skin_default.png" alt="Юкки" style="width:150px; cursor:pointer; transition:transform 0.1s;">
+  <div style="font-size:1.8em; margin-top:10px;">🍗 <span id="clickCount">0</span></div>
+</section>
+
+<script>
+  let clickCount = 0;
+  let clickPower = 1;
+  let autoClick = 0;
+
+  const clickDisplay = document.getElementById('clickCount');
+  const yukkiClicker = document.getElementById('clickerYukki');
+
+  yukkiClicker.addEventListener('click', () => {
+    clickCount += clickPower;
+    clickDisplay.textContent = clickCount;
+    yukkiClicker.style.transform = 'scale(1.1)';
+    setTimeout(() => yukkiClicker.style.transform = 'scale(1)', 100);
+  });
+
+  setInterval(() => {
+    if (autoClick > 0) {
+      clickCount += autoClick;
+      clickDisplay.textContent = clickCount;
+    }
+  }, 1000);
+</script>
+
 </body>
 </html>
-
