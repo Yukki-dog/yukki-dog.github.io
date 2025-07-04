@@ -696,7 +696,10 @@
   setStrokeStyle();
   updateTexts(languageSelector.value);
 
-  // Меняем язык
+ вот так?
+
+
+ // Меняем язык
   languageSelector.addEventListener("change", e => {
     updateTexts(e.target.value);
     factsBox.textContent = randomFact(e.target.value);
@@ -716,6 +719,348 @@
       document.body.style.color = "#333";
     }
   });
+</script>
+<!-- ======= Кликер Юкки ======= -->
+<div id="clickerContainer" style="margin-top: 30px; border: 2px solid #ff69b4; padding: 15px; border-radius: 16px; max-width: 340px; background: #fff0f6;">
+
+  <h2 id="clickerTitle" style="color:#ff1493; margin-bottom: 0.5rem;">Кликер Юкки 🍗</h2>
+
+  <img id="clickerYukki" src="Yukki_common.png" alt="Юкки" style="width:160px; cursor:pointer; border-radius: 12px; border: 3px solid #ff69b4; transition: transform 0.3s ease;" title="Кликни меня!" />
+
+  <div style="font-size:1.3rem; margin: 0.7rem 0;">
+    <span id="treatsLabel">Вкусняшки:</span> <span id="clickerScore">0</span> &nbsp;&nbsp;
+    <span id="autoClicksLabel">Автоклики/сек:</span> <span id="autoClicks">0</span>
+  </div>
+
+  <div style="margin-bottom: 10px;">
+    <button id="buyCursorDog" style="margin: 5px 10px; padding: 8px 16px; background:#ff69b4; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="10 вкусняшек">
+      Курсор 🐶 (10 🍗)
+    </button>
+    <button id="buySkinGlasses" style="margin: 5px 10px; padding: 8px 16px; background:#ff1493; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="50 вкусняшек">
+      Скин в очках (50 🍗)
+    </button>
+    <button id="buyCursorHeart" style="margin: 5px 10px; padding: 8px 16px; background:#db7093; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="100 вкусняшек">
+      Курсор ❣ (100 🍗)
+    </button>
+    <button id="buySkinHuman" style="margin: 5px 10px; padding: 8px 16px; background:#c71585; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="300 вкусняшек">
+      Скин Юкки-человек (300 🍗)
+    </button>
+    <button id="buyCursorFlame" style="margin: 5px 10px; padding: 8px 16px; background:#ff4500; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="1000 вкусняшек">
+      Курсор 🔥 (1000 🍗)
+    </button>
+    <button id="buySkinHat" style="margin: 5px 10px; padding: 8px 16px; background:#8b008b; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="2000 вкусняшек">
+      Скин в шляпе (2000 🍗)
+    </button>
+    <button id="buySkinShadow" style="margin: 5px 10px; padding: 8px 16px; background:#4b0082; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="5000 вкусняшек">
+      Скин силуэт (5000 🍗)
+    </button>
+    <button id="buyThemeViolet" style="margin: 5px 10px; padding: 8px 16px; background:#9400d3; border:none; border-radius: 22px; color:#fff; cursor:pointer;" title="10000 вкусняшек">
+      Фиолетовая тема (10000 🍗)
+    </button>
+  </div>
+
+  <!-- === Топ лидеров === -->
+  <div id="leaderboardSection" style="margin-top: 30px; text-align:center; font-family: monospace;">
+    <h3 id="leaderboardTitle">Топ-5 лидеров 🍗</h3>
+    <input type="text" id="playerNameInput" placeholder="Введи свой ник" style="padding:6px; font-size:1rem; width:200px;" maxlength="15" />
+    <button id="saveScoreBtn" style="margin-left:10px; padding:6px 12px; font-size:1rem; cursor:pointer;">Сохранить рекорд</button>
+    <pre id="leaderboardDisplay" style="background:#fff0f5; padding:10px; border-radius:8px; margin-top:10px; max-width:320px; margin-left:auto; margin-right:auto;">Пока нет рекордов.</pre>
+  </div>
+
+</div>
+
+<script>
+(() => {
+  // Переменные
+  let score = 0;
+  let autoClicks = 0;
+  let clickPower = 1;  // сколько вкусняшек за клик
+  const scoreEl = document.getElementById('clickerScore');
+  const autoClicksEl = document.getElementById('autoClicks');
+  const yukkiImg = document.getElementById('clickerYukki');
+
+  // Элементы топ-лидеров
+  const playerNameInput = document.getElementById("playerNameInput");
+  const saveScoreBtn = document.getElementById("saveScoreBtn");
+  const leaderboardDisplay = document.getElementById("leaderboardDisplay");
+  const leaderboardTitle = document.getElementById("leaderboardTitle");
+
+  // Языки и тексты
+  const texts = {
+    ru: {
+      title: "Кликер Юкки 🍗",
+      treats: "Вкусняшки",
+      autoClicks: "Автоклики/сек",
+      notEnoughTreats: "Недостаточно вкусняшек!",
+      buyCursorDog: "Курсор 🐶 (10 🍗)",
+      buySkinGlasses: "Скин в очках (50 🍗)",
+      buyCursorHeart: "Курсор ❣ (100 🍗)",
+      buySkinHuman: "Скин Юкки-человек (300 🍗)",
+      buyCursorFlame: "Курсор 🔥 (1000 🍗)",
+      buySkinHat: "Скин в шляпе (2000 🍗)",
+      buySkinShadow: "Скин силуэт (5000 🍗)",
+      buyThemeViolet: "Фиолетовая тема (10000 🍗)",
+      leaderboardTitle: "Топ-5 лидеров 🍗",
+      leaderboardPlaceholder: "Пока нет рекордов.",
+      inputPlaceholder: "Введи свой ник",
+      saveRecordBtn: "Сохранить рекорд",
+      alertEmptyName: "Пожалуйста, введи ник.",
+      alertRecordSaved: "Рекорд сохранён!"
+    },
+    uk: {
+      title: "Кліккер Юккі 🍗",
+      treats: "Смаколики",
+      autoClicks: "Автокліки/сек",
+      notEnoughTreats: "Недостатньо смаколиків!",
+      buyCursorDog: "Курсор 🐶 (10 🍗)",
+      buySkinGlasses: "Скін в окулярах (50 🍗)",
+      buyCursorHeart: "Курсор ❣ (100 🍗)",
+      buySkinHuman: "Скін Юккі-людина (300 🍗)",
+      buyCursorFlame: "Курсор 🔥 (1000 🍗)",
+      buySkinHat: "Скін у капелюсі (2000 🍗)",
+      buySkinShadow: "Скін силует (5000 🍗)",
+      buyThemeViolet: "Фіолетова тема (10000 🍗)",
+      leaderboardTitle: "Топ-5 лідерів 🍗",
+      leaderboardPlaceholder: "Поки немає рекордів.",
+      inputPlaceholder: "Введи свій нік",
+      saveRecordBtn: "Зберегти рекорд",
+      alertEmptyName: "Будь ласка, введи нік.",
+      alertRecordSaved: "Рекорд збережено!"
+    },
+    en: {
+      title: "Yukki Clicker 🍗",
+      treats: "Treats",
+      autoClicks: "Auto-clicks/sec",
+      notEnoughTreats: "Not enough treats!",
+      buyCursorDog: "Cursor 🐶 (10 🍗)",
+      buySkinGlasses: "Skin with Glasses (50 🍗)",
+      buyCursorHeart: "Cursor ❣ (100 🍗)",
+      buySkinHuman: "Yukki Human Skin (300 🍗)",
+      buyCursorFlame: "Cursor 🔥 (1000 🍗)",
+      buySkinHat: "Hat Skin (2000 🍗)",
+      buySkinShadow: "Shadow Skin (5000 🍗)",
+      buyThemeViolet: "Violet Theme (10000 🍗)",
+      leaderboardTitle: "Top-5 Leaders 🍗",
+      leaderboardPlaceholder: "No records yet.",
+      inputPlaceholder: "Enter your nickname",
+      saveRecordBtn: "Save Record",
+      alertEmptyName: "Please enter a nickname.",
+      alertRecordSaved: "Record saved!"
+    }
+  };
+
+  // Активный язык, например, из глобального селектора
+  let activeLang = "ru";
+  if(window.languageSelector && languageSelector.value) {
+    activeLang = languageSelector.value;
+  }
+
+  // Обновляем все надписи по языку
+  function updateTexts() {
+    document.getElementById('clickerTitle').textContent = texts[activeLang].title;
+    document.getElementById('treatsLabel').textContent = texts[activeLang].treats + ":";
+    document.getElementById('autoClicksLabel').textContent = texts[activeLang].autoClicks + ":";
+    document.getElementById('buyCursorDog').textContent = texts[activeLang].buyCursorDog;
+    document.getElementById('buySkinGlasses').textContent = texts[activeLang].buySkinGlasses;
+    document.getElementById('buyCursorHeart').textContent = texts[activeLang].buyCursorHeart;
+    document.getElementById('buySkinHuman').textContent = texts[activeLang].buySkinHuman;
+    document.getElementById('buyCursorFlame').textContent = texts[activeLang].buyCursorFlame;
+    document.getElementById('buySkinHat').textContent = texts[activeLang].buySkinHat;
+    document.getElementById('buySkinShadow').textContent = texts[activeLang].buySkinShadow;
+    document.getElementById('buyThemeViolet').textContent = texts[activeLang].buyThemeViolet;
+
+    leaderboardTitle.textContent = texts[activeLang].leaderboardTitle;
+    playerNameInput.placeholder = texts[activeLang].inputPlaceholder;
+    saveScoreBtn.textContent = texts[activeLang].saveRecordBtn;
+    if(leaderboard.length === 0) {
+      leaderboardDisplay.textContent = texts[activeLang].leaderboardPlaceholder;
+    }
+  }
+
+  updateTexts();
+
+  // Обновление счетчиков
+  function updateScoreDisplay() {
+    scoreEl.textContent = score.toLocaleString();
+    autoClicksEl.textContent = autoClicks.toLocaleString();
+  }
+
+  updateScoreDisplay();
+
+  // Анимация клика по Юкки
+  yukkiImg.addEventListener('click', () => {
+    yukkiImg.style.transform = "scale(1.15)";
+    setTimeout(() => {
+      yukkiImg.style.transform = "scale(1)";
+    }, 150);
+
+    score += clickPower;
+    updateScoreDisplay();
+  });
+
+  // Автоклики каждую секунду
+  setInterval(() => {
+    score += autoClicks;
+    updateScoreDisplay();
+  }, 1000);
+
+  // Магазин — кнопки
+  const buyCursorDogBtn = document.getElementById('buyCursorDog');
+  const buySkinGlassesBtn = document.getElementById('buySkinGlasses');
+  const buyCursorHeartBtn = document.getElementById('buyCursorHeart');
+  const buySkinHumanBtn = document.getElementById('buySkinHuman');
+  const buyCursorFlameBtn = document.getElementById('buyCursorFlame');
+  const buySkinHatBtn = document.getElementById('buySkinHat');
+  const buySkinShadowBtn = document.getElementById('buySkinShadow');
+  const buyThemeVioletBtn = document.getElementById('buyThemeViolet');
+
+  // Курсоры
+  const cursors = {
+    default: "auto",
+    dog: "url(cursor_dog.png) 16 16, auto",
+    heart: "url(cursor_heart.png) 16 16, auto",
+    flame: "url(cursor_flame.png) 16 16, auto"
+  };
+  document.body.style.cursor = cursors.default;
+
+  // Функция покупки с проверкой баланса
+  function buyItem(cost, onSuccess) {
+    if(score >= cost) {
+      score -= cost;
+      onSuccess();
+      updateScoreDisplay();
+    } else {
+      alert(texts[activeLang].notEnoughTreats);
+    }
+  }
+
+  buyCursorDogBtn.addEventListener('click', () => {
+    buyItem(10, () => {
+      autoClicks += 1;
+      document.body.style.cursor = cursors.dog;
+    });
+  });
+
+  buySkinGlassesBtn.addEventListener('click', () => {
+    buyItem(50, () => {
+      yukkiImg.src = "skin_glasses.png";
+    });
+  });
+
+  buyCursorHeartBtn.addEventListener('click', () => {
+    buyItem(100, () => {
+      autoClicks += 10;
+      document.body.style.cursor = cursors.heart;
+    });
+  });
+
+  buySkinHumanBtn.addEventListener('click', () => {
+    buyItem(300, () => {
+      yukkiImg.src = "skin_human.png";
+    });
+  });
+
+  buyCursorFlameBtn.addEventListener('click', () => {
+    buyItem(1000, () => {
+      autoClicks += 100;
+      document.body.style.cursor = cursors.flame;
+    });
+  });
+
+  buySkinHatBtn.addEventListener('click', () => {
+    buyItem(2000, () => {
+      yukkiImg.src = "skin_hat.png";
+    });
+  });
+
+  buySkinShadowBtn.addEventListener('click', () => {
+    buyItem(5000, () => {
+      yukkiImg.src = "skin_shadow.png";
+    });
+  });
+
+  buyThemeVioletBtn.addEventListener('click', () => {
+    buyItem(10000, () => {
+      document.body.style.background = "#3a0ca3";
+      document.body.style.color = "#eee";
+    });
+  });
+
+  // --- ТОП-5 ЛИДЕРОВ ---
+  let leaderboard = [];
+
+  function loadLeaderboard() {
+    const saved = localStorage.getItem("yukkiClickerLeaderboard");
+    if(saved) {
+      leaderboard = JSON.parse(saved);
+    } else {
+      leaderboard = [];
+    }
+    updateLeaderboardDisplay();
+  }
+
+  function saveLeaderboard() {
+    localStorage.setItem("yukkiClickerLeaderboard", JSON.stringify(leaderboard));
+  }
+
+  function updateLeaderboardDisplay() {
+    if(leaderboard.length === 0) {
+      leaderboardDisplay.textContent = texts[activeLang].leaderboardPlaceholder;
+      return;
+    }
+    let text = "";
+    leaderboard.slice(0,5).forEach((entry, i) => {
+      text += `${i+1}. ${entry.name} — ${entry.score.toLocaleString()} 🍗\n`;
+    });
+    leaderboardDisplay.textContent = text;
+  }
+
+  function tryAddToLeaderboard(name, scoreValue) {
+    if(!name.trim()) return false;
+
+    const idx = leaderboard.findIndex(e => e.name.toLowerCase() === name.toLowerCase());
+
+    if(idx >= 0) {
+      if(scoreValue > leaderboard[idx].score) {
+        leaderboard[idx].score = scoreValue;
+      }
+    } else {
+      leaderboard.push({name, score: scoreValue});
+    }
+
+    leaderboard.sort((a,b) => b.score - a.score);
+    if(leaderboard.length > 5) leaderboard = leaderboard.slice(0,5);
+
+    saveLeaderboard();
+    updateLeaderboardDisplay();
+    return true;
+  }
+
+  saveScoreBtn.addEventListener('click', () => {
+    const name = playerNameInput.value.trim();
+    if(!name) {
+      alert(texts[activeLang].alertEmptyName);
+      return;
+    }
+    tryAddToLeaderboard(name, score);
+    alert(texts[activeLang].alertRecordSaved);
+  });
+
+  // Обновление языка при смене в глобальном селекторе
+  if(window.languageSelector) {
+    languageSelector.addEventListener('change', e => {
+      activeLang = e.target.value;
+      updateTexts();
+      updateLeaderboardDisplay();
+    });
+  }
+
+  // Инициализация
+  loadLeaderboard();
+  updateTexts();
+  updateScoreDisplay();
+
+})();
 </script>
 
 </body>
