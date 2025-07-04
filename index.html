@@ -10,7 +10,6 @@
     background: #ffe4e1;
     color: #333;
     transition: background 0.3s, color 0.3s;
-    padding-bottom: 70px; /* место под кликер */
   }
   #container {
     max-width: 700px;
@@ -127,40 +126,38 @@
     opacity: 1;
     pointer-events: auto;
   }
-
-  /* Новый стиль для кликера внизу */
-  #clicker {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: #ff69b4;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 0;
-    box-shadow: 0 -2px 10px rgba(255, 105, 180, 0.7);
-    font-weight: 700;
-    font-size: 1.2rem;
-    z-index: 1000;
-    user-select: none;
+  #drawingArea {
+    margin: 1rem auto 2rem;
+    max-width: 700px;
+    text-align: center;
   }
-  #clicker button {
-    background: white;
-    color: #ff1493;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 20px;
-    font-weight: 700;
+  #canvas {
+    border: 2px solid #ff69b4;
+    border-radius: 10px;
+    touch-action: none;
+  }
+  .color-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
     cursor: pointer;
-    box-shadow: 0 3px 8px rgba(255, 20, 147, 0.5);
-    transition: background 0.3s;
+    display: inline-block;
+    margin: 3px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: border-color 0.3s;
   }
-  #clicker button:hover {
-    background: #ff1493;
-    color: white;
+  .color-btn.selected {
+    border-color: #fff;
+    box-shadow: 0 0 8px 2px #ff69b4;
+  }
+  #colorPalette {
+    margin-bottom: 10px;
+  }
+  label {
+    font-weight: 600;
+    margin-right: 6px;
+    user-select: none;
   }
 </style>
 </head>
@@ -207,32 +204,519 @@
   </div>
 
   <div id="factsBox" title="Факты о Юкки">Народилась 1 березня 2021 року.</div>
+
+  <div id="controls">
+    <button id="barkBtn" title="Гав-гав!">Гав-гав!</button>
+    <button id="meowBtn" title="Мяу от Юкки">Мяу от Юкки</button>
+    <button id="hintBtn" title="Что нарисовать?">Что нарисовать?</button>
+    <button id="clearBtn" title="Очистить рисунок">Стереть всё</button>
+
+    <select id="languageSelector" title="Выбери язык">
+      <option value="ru" selected>Русский</option>
+      <option value="uk">Українська</option>
+      <option value="en">English</option>
+    </select>
+
+    <select id="themeSelector" title="Выбери тему">
+      <option value="day" selected>День</option>
+      <option value="night">Ночь</option>
+      <option value="pink">Розовая</option>
+    </select>
+
+    <button id="musicToggle" title="Включить/выключить музыку">🔊</button>
+  </div>
+
+  <div id="drawingArea">
+    <div id="colorPalette"></div>
+    <label for="thicknessSelect" id="thicknessLabel">Толщина кисти:</label>
+    <select id="thicknessSelect" title="Выбери толщину кисти">
+      <option value="2">2 px</option>
+      <option value="4" selected>4 px</option>
+      <option value="6">6 px</option>
+      <option value="8">8 px</option>
+      <option value="12">12 px</option>
+    </select>
+    <br/>
+    <canvas id="canvas" width="680" height="400" style="touch-action:none;"></canvas>
+    <br/>
+    <button id="undoBtn" title="Отменить (←)">←</button>
+    <button id="redoBtn" title="Повторить (→)">→</button>
+  </div>
+
+  <button id="toTopBtn" title="Наверх">🠕</button>
 </div>
 
-<!-- Кликер внизу -->
-<div id="clicker">
-  <button id="clickButton">Кликни меня!</button>
-  <span>Количество кликов: <span id="clickCount">0</span></span>
-</div>
+<!-- Аудио -->
+<audio id="barkSound1" src="1.m4a" preload="auto"></audio>
+<audio id="barkSound2" src="2.m4a" preload="auto"></audio>
+<audio id="meowSound" src="3.m4a" preload="auto"></audio>
+<audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop preload="auto"></audio>
 
 <script>
-  // Простой кликер
-  const clickButton = document.getElementById('clickButton');
-  const clickCountSpan = document.getElementById('clickCount');
-  let clicks = 0;
+  const texts = {
+    ru: {
+      greeting: "Привет! Я Юкки — самая милая чихуахуа! 💖",
+      captions: {
+        capNewYear: "Юкки в шапочке эльфа у ёлки",
+        capPaw: "Юккина лапка",
+        capSitting: "Юкки очень мило сидит",
+        capWinter: "Стоит на двух передних лапах на снегу",
+        capCandy: "С конфетой в зубах (умеет открывать фантики!)",
+        capGlasses: "В очках, в которых отражается Киев 💖",
+        capHat: "Оригами шапка",
+        capToy: "Best friends forever 🤍"
+      },
+      facts: [
+        "Народилась 1 березня 2021 року.",
+        "У неё карие глаза.",
+        "Пухнастый хвост с белой кисточкой на конце.",
+        "Знает команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.",
+        "Любит гулять в комбезе.",
+        "Умеет открывать фантики конфет, где прячут вкусняшки.",
+        "Очень умная и быстро учится.",
+        "Обожает играть с любимой игрушкой — ёжиком.",
+        "Иногда застенчивая, но очень добрая и ласковая."
+      ],
+      buttons: {
+        bark: "Гав-гав!",
+        meow: "Мяу от Юкки",
+        day: "День",
+        night: "Ночь",
+        pink: "Розовая",
+        thicknessLabel: "Толщина кисти:",
+        hint: "Что нарисовать?",
+        clear: "Стереть всё"
+      },
+      drawHints: [
+        "Попробуй нарисовать: даёт лапу",
+        "Попробуй нарисовать: сидит",
+        "Попробуй нарисовать: с игрушкой",
+        "Попробуй нарисовать: улыбается",
+        "Попробуй нарисовать: с конфетой",
+        "Попробуй нарисовать: в шапке",
+        "Попробуй нарисовать: на прогулке",
+        "Попробуй нарисовать: хвост с кисточкой",
+        "Попробуй нарисовать: в очках",
+        "Попробуй нарисовать: у ёлки"
+      ]
+    },
+    uk: {
+      greeting: "Привіт! Я Юккі — наймиліша чихуахуа! 💖",
+      captions: {
+        capNewYear: "Юккі у шапочці ельфа біля ялинки",
+        capPaw: "Юккіна лапка",
+        capSitting: "Юккі дуже мило сидить",
+        capWinter: "Стоїть на двох передніх лапах на снігу",
+        capCandy: "З цукеркою в зубах (вміє відкривати фантики!)",
+        capGlasses: "В окулярах, у яких відбивається Київ 💖",
+        capHat: "Шапка оригамі",
+        capToy: "Найкращі друзі назавжди 🤍"
+      },
+      facts: [
+        "Народилась 1 березня 2021 року.",
+        "У неї карі очі.",
+        "Пухнастий хвіст із білою китичкою на кінці.",
+        "Знає команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
+        "Любить гуляти в комбінезоні.",
+        "Вміє відкривати фантики цукерок, де ховають смаколики.",
+        "Дуже розумна і швидко навчається.",
+        "Обожнює гратися з улюбленою іграшкою — їжачком.",
+        "Іноді сором’язлива, але дуже добра і лагідна."
+      ],
+      buttons: {
+        bark: "Гав-гав!",
+        meow: "Мяу від Юккі",
+        day: "День",
+        night: "Ніч",
+        pink: "Рожева",
+        thicknessLabel: "Товщина пензлика:",
+        hint: "Що намалювати?",
+        clear: "Очистити все"
+      },
+      drawHints: [
+        "Спробуй намалювати: дає лапу",
+        "Спробуй намалювати: сидить",
+        "Спробуй намалювати: з іграшкою",
+        "Спробуй намалювати: усміхається",
+        "Спробуй намалювати: з цукеркою",
+        "Спробуй намалювати: у шапці",
+        "Спробуй намалювати: на прогулянці",
+        "Спробуй намалювати: хвіст із китичкою",
+        "Спробуй намалювати: в окулярах",
+        "Спробуй намалювати: біля ялинки"
+      ]
+    },
+    en: {
+      greeting: "Hi! I'm Yukki — the cutest Chihuahua! 💖",
+      captions: {
+        capNewYear: "Yukki in an elf hat near the Christmas tree",
+        capPaw: "Yukki's paw",
+        capSitting: "Yukki sitting very cutely",
+        capWinter: "Standing on two front paws on snow",
+        capCandy: "With candy in her teeth (can unwrap wrappers!)",
+        capGlasses: "Wearing glasses reflecting Kyiv 💖",
+        capHat: "Origami hat",
+        capToy: "Best friends forever 🤍"
+      },
+      facts: [
+        "Born on March 1, 2021.",
+        "She has brown eyes.",
+        "Fluffy tail with a white tip.",
+        "Knows commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
+        "Loves walking in her jumpsuit.",
+        "Can unwrap candy wrappers where treats are hidden.",
+        "Very smart and learns quickly.",
+        "Loves playing with her favorite toy — a hedgehog.",
+        "Sometimes shy, but very kind and gentle."
+      ],
+      buttons: {
+        bark: "Bark bark!",
+        meow: "Meow from Yukki",
+        day: "Day",
+        night: "Night",
+        pink: "Pink",
+        thicknessLabel: "Brush thickness:",
+        hint: "What to draw?",
+        clear: "Clear all"
+      },
+      drawHints: [
+        "Try to draw: give paw",
+        "Try to draw: sitting",
+        "Try to draw: with toy",
+        "Try to draw: smiling",
+        "Try to draw: with candy",
+        "Try to draw: wearing hat",
+        "Try to draw: on a walk",
+        "Try to draw: tail with tip",
+        "Try to draw: wearing glasses",
+        "Try to draw: near the Christmas tree"
+      ]
+    }
+  };
 
-  clickButton.addEventListener('click', () => {
-    clicks++;
-    clickCountSpan.textContent = clicks;
+  // Цвета (20)
+  const colors = [
+  // коричневые
+  "#6B4226", "#A0522D", "#D2691E", "#8B4513", "#F4A460",
+  "#CD853F", "#DEB887", "#FFE4C4",
+  // красные
+  "#8B0000", "#FF6347", "#FF4500", "#DC143C",
+  // синие
+  "#00008B", "#4169E1", "#4682B4", "#5F9EA0",
+  // зелёные
+  "#2E8B57", "#3CB371", "#66CDAA", "#8FBC8F",
+  // фиолетовые
+  "#800080", "#8A2BE2", "#9400D3",
+  // жёлтые и оранжевые
+  "#FFD700", "#FFA500", "#F0E68C",
+  // розовые и пастельные
+  "#FF69B4", "#FFB6C1", "#E6E6FA", "#D8BFD8"
+];
+
+
+
+  const barkBtn = document.getElementById("barkBtn");
+  const meowBtn = document.getElementById("meowBtn");
+  const hintBtn = document.getElementById("hintBtn");
+  const clearBtn = document.getElementById("clearBtn");
+  const languageSelector = document.getElementById("languageSelector");
+  const themeSelector = document.getElementById("themeSelector");
+  const musicToggle = document.getElementById("musicToggle");
+  const factsBox = document.getElementById("factsBox");
+  const thicknessLabel = document.getElementById("thicknessLabel");
+
+  // Инициализация фоток и подписей
+  function updateCaptions(lang) {
+    const caps = texts[lang].captions;
+    for (const id in caps) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = caps[id];
+    }
+  }
+
+  // Обновить текст и кнопки по языку
+  function updateTexts(lang) {
+    document.getElementById("greeting").textContent = texts[lang].greeting;
+    updateCaptions(lang);
+    factsBox.textContent = randomFact(lang);
+
+    barkBtn.textContent = texts[lang].buttons.bark;
+    meowBtn.textContent = texts[lang].buttons.meow;
+    hintBtn.textContent = texts[lang].buttons.hint;
+    clearBtn.textContent = texts[lang].buttons.clear;
+
+    // Обновить темы
+    themeSelector.options[0].text = texts[lang].buttons.day;
+    themeSelector.options[1].text = texts[lang].buttons.night;
+    themeSelector.options[2].text = texts[lang].buttons.pink;
+
+    // Надпись для толщины
+    thicknessLabel.textContent = texts[lang].buttons.thicknessLabel;
+  }
+
+  function randomFact(lang) {
+    const arr = texts[lang].facts;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Показывать подсказку для рисования
+  hintBtn.addEventListener("click", () => {
+    const lang = languageSelector.value;
+    const hints = texts[lang].drawHints;
+    const hint = hints[Math.floor(Math.random() * hints.length)];
+    alert(hint);
   });
 
-  // Дополнительно: аватар "гав-гав"
-  const yukkiAvatar = document.getElementById('yukkiAvatar');
-  yukkiAvatar.addEventListener('click', () => {
-    alert('Гав-гав! 🐶');
+  // Кнопка стирания
+  clearBtn.addEventListener("click", () => {
+    strokes = [];
+    undoneStrokes = [];
+    redraw();
+  });
+
+  // Звуки
+  const barkSounds = [
+    document.getElementById("barkSound1"),
+    document.getElementById("barkSound2"),
+  ];
+  const meowSound = document.getElementById("meowSound");
+  const bgMusic = document.getElementById("bgMusic");
+
+  barkBtn.addEventListener("click", () => {
+    const snd = barkSounds[Math.floor(Math.random() * barkSounds.length)];
+    snd.currentTime = 0;
+    snd.play();
+  });
+  meowBtn.addEventListener("click", () => {
+    meowSound.currentTime = 0;
+    meowSound.play();
+  });
+  musicToggle.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = "🔈";
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = "🔊";
+    }
+  });
+
+  // Прокрутка вверх
+  const toTopBtn = document.getElementById("toTopBtn");
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 100) toTopBtn.classList.add("show");
+    else toTopBtn.classList.remove("show");
+  });
+  toTopBtn.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  // Аватарка — гав-гав!
+  const yukkiAvatar = document.getElementById("yukkiAvatar");
+  yukkiAvatar.addEventListener("click", () => {
+    barkBtn.click();
+  });
+
+  // --- Рисовалка ---
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  let drawing = false;
+  let currentStroke = null;
+  let strokes = [];
+  let undoneStrokes = [];
+
+  let color = colors[0];
+  let thickness = 4;
+
+  // Отрисовка цвета кнопок
+  const colorPalette = document.getElementById("colorPalette");
+  colors.forEach(c => {
+    const btn = document.createElement("span");
+    btn.className = "color-btn";
+    btn.style.backgroundColor = c;
+    btn.dataset.color = c;
+    colorPalette.appendChild(btn);
+  });
+
+  // Выделяем первый цвет по умолчанию
+  colorPalette.firstChild.classList.add("selected");
+
+  // Установка стиля кисти
+  function setStrokeStyle() {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+  }
+
+  // Перерисовать все штрихи
+  function redraw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const stroke of strokes) {
+      ctx.beginPath();
+      ctx.strokeStyle = stroke.color;
+      ctx.lineWidth = stroke.thickness;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      const pts = stroke.points;
+      if (pts.length > 0) ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // События рисования
+  canvas.addEventListener("mousedown", e => {
+    drawing = true;
+    currentStroke = {
+      points: [{ x: e.offsetX, y: e.offsetY }],
+      color,
+      thickness
+    };
+    undoneStrokes = [];
+  });
+
+  canvas.addEventListener("mousemove", e => {
+    if (!drawing) return;
+    currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
+    redraw();
+    // Рисуем текущий штрих поверх
+    ctx.beginPath();
+    ctx.strokeStyle = currentStroke.color;
+    ctx.lineWidth = currentStroke.thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const pts = currentStroke.points;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("mouseup", e => {
+    if (!drawing) return;
+    drawing = false;
+    strokes.push(currentStroke);
+    currentStroke = null;
+    redraw();
+  });
+  // --- Touch-события для рисования на телефонах ---
+  canvas.addEventListener("touchstart", e => {
+    e.preventDefault(); // чтобы страница не скроллилась
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    drawing = true;
+    currentStroke = {
+      points: [{ x, y }],
+      color,
+      thickness
+    };
+    undoneStrokes = [];
+  });
+
+  canvas.addEventListener("touchmove", e => {
+    if (!drawing) return;
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+    currentStroke.points.push({ x, y });
+    redraw();
+
+    // Отрисовка текущей линии
+    ctx.beginPath();
+    ctx.strokeStyle = currentStroke.color;
+    ctx.lineWidth = currentStroke.thickness;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    const pts = currentStroke.points;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+  });
+
+  canvas.addEventListener("touchend", e => {
+    if (!drawing) return;
+    drawing = false;
+    strokes.push(currentStroke);
+    currentStroke = null;
+    redraw();
+  });
+
+  canvas.addEventListener("mouseleave", e => {
+    if (drawing) {
+      drawing = false;
+      if (currentStroke) {
+        strokes.push(currentStroke);
+        currentStroke = null;
+        redraw();
+      }
+    }
+  });
+
+  // Цвета - выбор
+  colorPalette.querySelectorAll(".color-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      color = btn.dataset.color;
+      setStrokeStyle();
+      // Выделение
+      colorPalette.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+  });
+
+  // Толщина кисти
+  document.getElementById("thicknessSelect").addEventListener("change", e => {
+    thickness = +e.target.value;
+    setStrokeStyle();
+  });
+
+  // Undo
+  document.getElementById("undoBtn").addEventListener("click", () => {
+    if (strokes.length === 0) return;
+    undoneStrokes.push(strokes.pop());
+    redraw();
+  });
+  // Redo
+  document.getElementById("redoBtn").addEventListener("click", () => {
+    if (undoneStrokes.length === 0) return;
+    strokes.push(undoneStrokes.pop());
+    redraw();
+  });
+
+  // Инициализация при загрузке
+  setStrokeStyle();
+  updateTexts(languageSelector.value);
+
+  // Меняем язык
+  languageSelector.addEventListener("change", e => {
+    updateTexts(e.target.value);
+    factsBox.textContent = randomFact(e.target.value);
+  });
+
+  // Смена темы — (пример, просто меняет фон)
+  themeSelector.addEventListener("change", e => {
+    const val = e.target.value;
+    if (val === "day") {
+      document.body.style.background = "#ffe4e1";
+      document.body.style.color = "#333";
+    } else if (val === "night") {
+      document.body.style.background = "#1a1a2e";
+      document.body.style.color = "#ddd";
+    } else if (val === "pink") {
+      document.body.style.background = "#f8c8dc";
+      document.body.style.color = "#333";
+    }
   });
 </script>
 
 </body>
 </html>
-
