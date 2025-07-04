@@ -14,7 +14,7 @@
   #container {
     max-width: 700px;
     margin: 2rem auto;
-    padding: 0 1rem;
+    padding: 0 1rem 4rem 1rem;
     text-align: center;
   }
   #title {
@@ -69,14 +69,15 @@
     left: 12px;
     max-width: 280px;
     padding: 10px 15px;
-    background: rgba(255 255 255 / 0.85);
+    background: rgba(255 255 255 / 0.6);
     border-radius: 12px;
     font-size: 1rem;
     font-style: italic;
     color: #555;
-    box-shadow: 0 0 10px rgba(255, 192, 203, 0.7);
+    box-shadow: 0 0 12px rgba(255, 192, 203, 0.7);
     transition: opacity 0.5s ease;
     user-select: none;
+    pointer-events: none;
   }
   #controls {
     display: flex;
@@ -159,9 +160,75 @@
     margin-right: 6px;
     user-select: none;
   }
+  /* Голосование */
+  #votingSection {
+    margin: 2rem auto 4rem auto;
+    max-width: 700px;
+    background: #fff0f6;
+    border: 2px solid #ff69b4;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+  }
+  #votingSection h2 {
+    margin-top: 0;
+    color: #c71585;
+  }
+  .vote-option {
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
+  }
+  .vote-option input[type="radio"] {
+    margin-right: 8px;
+    cursor: pointer;
+  }
+  #voteBtn, #resetVotesBtn {
+    margin-top: 1rem;
+    background: #ff1493;
+    box-shadow: 0 3px 8px rgba(255, 20, 147, 0.7);
+  }
+  #voteBtn:disabled {
+    background: #e0a3c2;
+    cursor: default;
+    box-shadow: none;
+  }
+  #results {
+    margin-top: 1.5rem;
+    font-style: italic;
+    color: #8b008b;
+  }
+  /* Темы: кнопки, фон, текст */
+  body.day-theme {
+    background: #ffe4e1;
+    color: #333;
+  }
+  body.night-theme {
+    background: #1a1a2e;
+    color: #ddd;
+  }
+  body.night-theme button, body.night-theme select {
+    background: #6a0dad;
+    color: #eee;
+    box-shadow: 0 3px 8px rgba(106, 13, 173, 0.5);
+  }
+  body.night-theme button:hover, body.night-theme select:hover {
+    background: #9400d3;
+  }
+  body.pink-theme {
+    background: #f8c8dc;
+    color: #333;
+  }
+  body.pink-theme button, body.pink-theme select {
+    background: #ff69b4;
+    color: white;
+    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
+  }
+  body.pink-theme button:hover, body.pink-theme select:hover {
+    background: #ff1493;
+  }
 </style>
 </head>
-<body>
+<body class="day-theme">
 
 <div id="container">
   <h1 id="title">Yukki</h1>
@@ -243,6 +310,16 @@
     <button id="redoBtn" title="Повторить (→)">→</button>
   </div>
 
+  <!-- Голосование -->
+  <div id="votingSection">
+    <h2>Голосование: кто победит?</h2>
+    <div id="voteOptions"></div>
+    <button id="voteBtn" disabled>Голосовать</button>
+    <button id="resetVotesBtn" title="Сбросить голоса (только для теста)">Сбросить голоса</button>
+    <div id="results"></div>
+    <div id="voteMessage" style="margin-top: 1rem; color: #b03060; font-weight: 600;"></div>
+  </div>
+
   <button id="toTopBtn" title="Наверх">🠕</button>
 </div>
 
@@ -253,6 +330,7 @@
 <audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop preload="auto"></audio>
 
 <script>
+  // === Тексты и факты ===
   const texts = {
     ru: {
       greeting: "Привет! Я Юкки — самая милая чихуахуа! 💖",
@@ -290,36 +368,48 @@
       drawHints: [
         "Попробуй нарисовать: даёт лапу",
         "Попробуй нарисовать: сидит",
-        "Попробуй нарисовать: с игрушкой",
-        "Попробуй нарисовать: улыбается",
-        "Попробуй нарисовать: с конфетой",
-        "Попробуй нарисовать: в шапке",
-        "Попробуй нарисовать: на прогулке",
-        "Попробуй нарисовать: хвост с кисточкой",
-        "Попробуй нарисовать: в очках",
-        "Попробуй нарисовать: у ёлки"
-      ]
+        "Попробуй нарисовать: Юкки в шапочке",
+        "Нарисуй конфету, которую Юкки любит",
+        "Нарисуй любимую игрушку ёжика"
+      ],
+      voteGroups: [
+        { range: [1, 2], options: ["Юкки", "Пылесос", "Огурчик"] },
+        { range: [3, 5], options: ["Дракон", "Маг", "Фея"] },
+        { range: [6, 8], options: ["Магма-слайм", "Ядерный слайм", "Украинский слайм"] },
+        { range: [9, 11], options: ["Феникс", "Котопес", "Каменные пикмины из Nintendo"] },
+        { range: [12, 15], options: ["Марио", "Луиджи", "Принцесса Пич"] },
+        { range: [16, 20], options: ["Линк", "Пакман", "100 приведений"] },
+        { range: [22, 28], options: ["Гарри Поттер", "Волан-де-Морт", "Сова Букля"] }
+      ],
+      voteNoVotingDays: [29, 30, 31],
+      voteButton: "Голосовать",
+      voteResetButton: "Сбросить голоса",
+      voteAlready: "Вы уже голосовали в этом голосовании.",
+      voteThanks: "Спасибо за ваш голос!",
+      voteChooseOption: "Пожалуйста, выберите вариант для голосования.",
+      resultsTitle: "Результаты голосования",
+      voteMessage: "Кто победит?"
     },
     uk: {
       greeting: "Привіт! Я Юккі — наймиліша чихуахуа! 💖",
       captions: {
-        capNewYear: "Юккі у шапочці ельфа біля ялинки",
-        capPaw: "Юккіна лапка",
+        capNewYear: "Юккі в шапочці ельфа біля ялинки",
+        capPaw: "Лапка Юккі",
         capSitting: "Юккі дуже мило сидить",
         capWinter: "Стоїть на двох передніх лапах на снігу",
-        capCandy: "З цукеркою в зубах (вміє відкривати фантики!)",
-        capGlasses: "В окулярах, у яких відбивається Київ 💖",
-        capHat: "Шапка оригамі",
+        capCandy: "З цукеркою в зубах (вміє відкривати обгортки!)",
+        capGlasses: "В окулярах, в яких відбивається Київ 💖",
+        capHat: "Орігамі капелюх",
         capToy: "Найкращі друзі назавжди 🤍"
       },
       facts: [
         "Народилась 1 березня 2021 року.",
         "У неї карі очі.",
-        "Пухнастий хвіст із білою китичкою на кінці.",
-        "Знає команди: сидіти, лежати, дати п'ять, на добраніч, в засаді, атакуй, дай лапу, служити.",
+        "Пухнастий хвіст із білою пензликом на кінці.",
+        "Знає команди: сидіти, лежати, дати п'ять, спокойної ночі, в засаді, атакуй, дай лапу, служити.",
         "Любить гуляти в комбінезоні.",
-        "Вміє відкривати фантики цукерок, де ховають смаколики.",
-        "Дуже розумна і швидко навчається.",
+        "Вміє відкривати обгортки цукерок, де ховаються ласощі.",
+        "Дуже розумна і швидко вчиться.",
         "Обожнює гратися з улюбленою іграшкою — їжачком.",
         "Іноді сором’язлива, але дуже добра і лагідна."
       ],
@@ -329,48 +419,60 @@
         day: "День",
         night: "Ніч",
         pink: "Рожева",
-        thicknessLabel: "Товщина пензлика:",
+        thicknessLabel: "Товщина кисті:",
         hint: "Що намалювати?",
-        clear: "Очистити все"
+        clear: "Стерти все"
       },
       drawHints: [
         "Спробуй намалювати: дає лапу",
         "Спробуй намалювати: сидить",
-        "Спробуй намалювати: з іграшкою",
-        "Спробуй намалювати: усміхається",
-        "Спробуй намалювати: з цукеркою",
-        "Спробуй намалювати: у шапці",
-        "Спробуй намалювати: на прогулянці",
-        "Спробуй намалювати: хвіст із китичкою",
-        "Спробуй намалювати: в окулярах",
-        "Спробуй намалювати: біля ялинки"
-      ]
+        "Спробуй намалювати: Юккі в шапочці",
+        "Намалюй цукерку, яку любить Юккі",
+        "Намалюй улюблену іграшку їжачка"
+      ],
+      voteGroups: [
+        { range: [1, 2], options: ["Юккі", "Пилосос", "Огірок"] },
+        { range: [3, 5], options: ["Дракон", "Маг", "Фея"] },
+        { range: [6, 8], options: ["Магма-слайм", "Ядерний слайм", "Український слайм"] },
+        { range: [9, 11], options: ["Фенікс", "Котопес", "Кам'яні пікміни з Nintendo"] },
+        { range: [12, 15], options: ["Маріо", "Луіджі", "Принцеса Піч"] },
+        { range: [16, 20], options: ["Лінк", "Пакман", "100 привидів"] },
+        { range: [22, 28], options: ["Гаррі Поттер", "Волан-де-Морт", "Сова Ґедвіга"] }
+      ],
+      voteNoVotingDays: [29, 30, 31],
+      voteButton: "Голосувати",
+      voteResetButton: "Скинути голоси",
+      voteAlready: "Ви вже голосували в цьому голосуванні.",
+      voteThanks: "Дякуємо за ваш голос!",
+      voteChooseOption: "Будь ласка, виберіть варіант для голосування.",
+      resultsTitle: "Результати голосування",
+      voteMessage: "Хто переможе?"
     },
     en: {
-      greeting: "Hi! I'm Yukki — the cutest Chihuahua! 💖",
+      greeting: "Hello! I'm Yukki — the cutest chihuahua! 💖",
       captions: {
         capNewYear: "Yukki in an elf hat near the Christmas tree",
         capPaw: "Yukki's paw",
-        capSitting: "Yukki sitting very cutely",
-        capWinter: "Standing on two front paws on snow",
-        capCandy: "With candy in her teeth (can unwrap wrappers!)",
-        capGlasses: "Wearing glasses reflecting Kyiv 💖",
+        capSitting: "Yukki sitting cutely",
+        capWinter: "Standing on two front paws in the snow",
+        capCandy: "With candy in teeth (can unwrap sweets!)",
+        capGlasses: "In glasses reflecting Kyiv 💖",
         capHat: "Origami hat",
         capToy: "Best friends forever 🤍"
       },
       facts: [
         "Born on March 1, 2021.",
-        "She has brown eyes.",
-        "Fluffy tail with a white tip.",
-        "Knows commands: sit, lie down, give five, good night, in ambush, attack, give paw, serve.",
-        "Loves walking in her jumpsuit.",
-        "Can unwrap candy wrappers where treats are hidden.",
-        "Very smart and learns quickly.",
-        "Loves playing with her favorite toy — a hedgehog.",
-        "Sometimes shy, but very kind and gentle."
+        "Has brown eyes.",
+        "Fluffy tail with a white tip at the end.",
+        "Knows commands: sit, lie down, give five, good night, ambush, attack, give paw, serve.",
+        "Loves to walk in a jumpsuit.",
+        "Can unwrap candy wrappers where treats hide.",
+        "Very smart and learns fast.",
+        "Loves playing with favorite hedgehog toy.",
+        "Sometimes shy but very kind and affectionate."
       ],
       buttons: {
-        bark: "Bark bark!",
+        bark: "Bark!",
         meow: "Meow from Yukki",
         day: "Day",
         night: "Night",
@@ -380,343 +482,440 @@
         clear: "Clear all"
       },
       drawHints: [
-        "Try to draw: give paw",
+        "Try to draw: giving paw",
         "Try to draw: sitting",
-        "Try to draw: with toy",
-        "Try to draw: smiling",
-        "Try to draw: with candy",
-        "Try to draw: wearing hat",
-        "Try to draw: on a walk",
-        "Try to draw: tail with tip",
-        "Try to draw: wearing glasses",
-        "Try to draw: near the Christmas tree"
-      ]
+        "Try to draw: Yukki in a hat",
+        "Draw the candy Yukki loves",
+        "Draw the favorite hedgehog toy"
+      ],
+      voteGroups: [
+        { range: [1, 2], options: ["Yukki", "Vacuum", "Cucumber"] },
+        { range: [3, 5], options: ["Dragon", "Mage", "Fairy"] },
+        { range: [6, 8], options: ["Magma Slime", "Nuclear Slime", "Ukrainian Slime"] },
+        { range: [9, 11], options: ["Phoenix", "Catdog", "Stone Pikmin from Nintendo"] },
+        { range: [12, 15], options: ["Mario", "Luigi", "Princess Peach"] },
+        { range: [16, 20], options: ["Link", "Pac-Man", "100 Ghosts"] },
+        { range: [22, 28], options: ["Harry Potter", "Voldemort", "Hedwig the Owl"] }
+      ],
+      voteNoVotingDays: [29, 30, 31],
+      voteButton: "Vote",
+      voteResetButton: "Reset votes",
+      voteAlready: "You have already voted in this poll.",
+      voteThanks: "Thanks for your vote!",
+      voteChooseOption: "Please select an option to vote.",
+      resultsTitle: "Voting Results",
+      voteMessage: "Who will win?"
     }
   };
 
-  // Цвета (20)
-  const colors = [
-  // коричневые
-  "#6B4226", "#A0522D", "#D2691E", "#8B4513", "#F4A460",
-  "#CD853F", "#DEB887", "#FFE4C4",
-  // красные
-  "#8B0000", "#FF6347", "#FF4500", "#DC143C",
-  // синие
-  "#00008B", "#4169E1", "#4682B4", "#5F9EA0",
-  // зелёные
-  "#2E8B57", "#3CB371", "#66CDAA", "#8FBC8F",
-  // фиолетовые
-  "#800080", "#8A2BE2", "#9400D3",
-  // жёлтые и оранжевые
-  "#FFD700", "#FFA500", "#F0E68C",
-  // розовые и пастельные
-  "#FF69B4", "#FFB6C1", "#E6E6FA", "#D8BFD8"
-];
+  // --- Переменные ---
+  let lang = 'ru';
 
+  // === Инициализация DOM элементов ===
+  const greetingEl = document.getElementById('greeting');
+  const captionsEls = {
+    capNewYear: document.getElementById('capNewYear'),
+    capPaw: document.getElementById('capPaw'),
+    capSitting: document.getElementById('capSitting'),
+    capWinter: document.getElementById('capWinter'),
+    capCandy: document.getElementById('capCandy'),
+    capGlasses: document.getElementById('capGlasses'),
+    capHat: document.getElementById('capHat'),
+    capToy: document.getElementById('capToy')
+  };
+  const factsBox = document.getElementById('factsBox');
 
+  // --- Кнопки ---
+  const barkBtn = document.getElementById('barkBtn');
+  const meowBtn = document.getElementById('meowBtn');
+  const hintBtn = document.getElementById('hintBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const themeSelector = document.getElementById('themeSelector');
+  const languageSelector = document.getElementById('languageSelector');
+  const musicToggle = document.getElementById('musicToggle');
 
-  const barkBtn = document.getElementById("barkBtn");
-  const meowBtn = document.getElementById("meowBtn");
-  const hintBtn = document.getElementById("hintBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const languageSelector = document.getElementById("languageSelector");
-  const themeSelector = document.getElementById("themeSelector");
-  const musicToggle = document.getElementById("musicToggle");
-  const factsBox = document.getElementById("factsBox");
-  const thicknessLabel = document.getElementById("thicknessLabel");
+  // Аудио
+  const barkSound1 = document.getElementById('barkSound1');
+  const barkSound2 = document.getElementById('barkSound2');
+  const meowSound = document.getElementById('meowSound');
+  const bgMusic = document.getElementById('bgMusic');
 
-  // Инициализация фоток и подписей
-  function updateCaptions(lang) {
-    const caps = texts[lang].captions;
-    for (const id in caps) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = caps[id];
-    }
+  // Кликер счётчики
+  let barkCount = 0;
+  let meowCount = 0;
+
+  // === Факты с интервалом 15 сек ===
+  function showRandomFact() {
+    const factList = texts[lang].facts;
+    const fact = factList[Math.floor(Math.random() * factList.length)];
+    factsBox.textContent = fact;
+    factsBox.style.opacity = '1';
+    setTimeout(() => {
+      factsBox.style.opacity = '0.2';
+    }, 12000);
   }
+  setInterval(showRandomFact, 15000);
+  showRandomFact();
 
-  // Обновить текст и кнопки по языку
-  function updateTexts(lang) {
-    document.getElementById("greeting").textContent = texts[lang].greeting;
-    updateCaptions(lang);
-    factsBox.textContent = randomFact(lang);
-
+  // === Обновление текста по языку ===
+  function updateTexts() {
+    greetingEl.textContent = texts[lang].greeting;
+    for (const key in captionsEls) {
+      if (captionsEls[key]) {
+        captionsEls[key].textContent = texts[lang].captions[key];
+      }
+    }
     barkBtn.textContent = texts[lang].buttons.bark;
     meowBtn.textContent = texts[lang].buttons.meow;
     hintBtn.textContent = texts[lang].buttons.hint;
     clearBtn.textContent = texts[lang].buttons.clear;
+    document.getElementById('thicknessLabel').textContent = texts[lang].buttons.thicknessLabel;
 
-    // Обновить темы
-    themeSelector.options[0].text = texts[lang].buttons.day;
-    themeSelector.options[1].text = texts[lang].buttons.night;
-    themeSelector.options[2].text = texts[lang].buttons.pink;
-
-    // Надпись для толщины
-    thicknessLabel.textContent = texts[lang].buttons.thicknessLabel;
+    // Обновить голосование
+    buildVotingSection();
   }
 
-  function randomFact(lang) {
-    const arr = texts[lang].facts;
-    return arr[Math.floor(Math.random() * arr.length)];
+  languageSelector.addEventListener('change', (e) => {
+    lang = e.target.value;
+    updateTexts();
+  });
+
+  // === Улучшенное переключение тем ===
+  function applyTheme(theme) {
+    document.body.classList.remove('day-theme', 'night-theme', 'pink-theme');
+    if (theme === 'day') document.body.classList.add('day-theme');
+    else if (theme === 'night') document.body.classList.add('night-theme');
+    else if (theme === 'pink') document.body.classList.add('pink-theme');
+  }
+  themeSelector.addEventListener('change', e => {
+    applyTheme(e.target.value);
+  });
+  applyTheme(themeSelector.value);
+
+  // === Кликер - звуки гав/мяу ===
+  const barkSounds = [barkSound1, barkSound2];
+  barkBtn.addEventListener('click', () => {
+    barkCount++;
+    // Случайный гавк
+    const s = barkSounds[Math.floor(Math.random() * barkSounds.length)];
+    s.currentTime = 0;
+    s.play();
+  });
+  meowBtn.addEventListener('click', () => {
+    meowCount++;
+    meowSound.currentTime = 0;
+    meowSound.play();
+  });
+
+  // === Рисовалка ===
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let drawing = false;
+  let currentColor = '#ff1493';
+  let lineWidth = 4;
+
+  const colorPalette = ['#ff1493', '#ff69b4', '#800080', '#000000', '#ffffff', '#ff4500', '#1e90ff'];
+  const colorPaletteEl = document.getElementById('colorPalette');
+  const thicknessSelect = document.getElementById('thicknessSelect');
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+
+  // История для undo/redo
+  let undoStack = [];
+  let redoStack = [];
+
+  function saveState() {
+    redoStack = [];
+    undoStack.push(canvas.toDataURL());
+    if (undoStack.length > 50) undoStack.shift();
   }
 
-  // Показывать подсказку для рисования
-  hintBtn.addEventListener("click", () => {
-    const lang = languageSelector.value;
+  function restoreState(stackFrom, stackTo) {
+    if (stackFrom.length === 0) return;
+    const state = stackFrom.pop();
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = state;
+    stackTo.push(state);
+  }
+
+  undoBtn.addEventListener('click', () => {
+    if (undoStack.length > 1) {
+      restoreState(undoStack, redoStack);
+    }
+  });
+  redoBtn.addEventListener('click', () => {
+    if (redoStack.length > 0) {
+      restoreState(redoStack, undoStack);
+    }
+  });
+
+  function drawLine(x1, y1, x2, y2) {
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  let lastX = 0;
+  let lastY = 0;
+
+  canvas.addEventListener('pointerdown', (e) => {
+    drawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    saveState();
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    drawLine(lastX, lastY, x, y);
+    lastX = x;
+    lastY = y;
+  });
+  canvas.addEventListener('pointerup', () => {
+    drawing = false;
+  });
+  canvas.addEventListener('pointerleave', () => {
+    drawing = false;
+  });
+
+  // Создать кнопки цвета
+  function createColorButtons() {
+    colorPaletteEl.innerHTML = '';
+    colorPalette.forEach(color => {
+      const btn = document.createElement('span');
+      btn.className = 'color-btn';
+      btn.style.backgroundColor = color;
+      if (color === currentColor) btn.classList.add('selected');
+      btn.title = color;
+      btn.addEventListener('click', () => {
+        currentColor = color;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+      colorPaletteEl.appendChild(btn);
+    });
+  }
+  createColorButtons();
+
+  thicknessSelect.addEventListener('change', (e) => {
+    lineWidth = +e.target.value;
+  });
+
+  clearBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveState();
+  });
+
+  // Подсказки для рисования
+  hintBtn.addEventListener('click', () => {
     const hints = texts[lang].drawHints;
     const hint = hints[Math.floor(Math.random() * hints.length)];
     alert(hint);
   });
 
-  // Кнопка стирания
-  clearBtn.addEventListener("click", () => {
-    strokes = [];
-    undoneStrokes = [];
-    redraw();
+  // === Плеер музыки ===
+  musicToggle.addEventListener('click', () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = '🔈';
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = '🔊';
+    }
   });
 
-  // Звуки
-  const barkSounds = [
-    document.getElementById("barkSound1"),
-    document.getElementById("barkSound2"),
-  ];
-  const meowSound = document.getElementById("meowSound");
-  const bgMusic = document.getElementById("bgMusic");
-
-  barkBtn.addEventListener("click", () => {
-    const snd = barkSounds[Math.floor(Math.random() * barkSounds.length)];
-    snd.currentTime = 0;
-    snd.play();
+  // === Кнопка "Наверх" ===
+  const toTopBtn = document.getElementById('toTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 250) {
+      toTopBtn.classList.add('show');
+    } else {
+      toTopBtn.classList.remove('show');
+    }
   });
-  meowBtn.addEventListener("click", () => {
+  toTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // === Голосование ===
+  const votingSection = document.getElementById('votingSection');
+  const voteOptionsDiv = document.getElementById('voteOptions');
+  const voteBtn = document.getElementById('voteBtn');
+  const resetVotesBtn = document.getElementById('resetVotesBtn');
+  const resultsDiv = document.getElementById('results');
+  const voteMessageDiv = document.getElementById('voteMessage');
+
+  // Вычислить номер сегодняшнего дня
+  function getTodayDayNumber() {
+    const today = new Date();
+    return today.getDate();
+  }
+
+  // Получить текущую группу голосования по дате
+  function getCurrentVoteGroup() {
+    const day = getTodayDayNumber();
+    // Если день в no-voting - вернуть null
+    if (texts[lang].voteNoVotingDays.includes(day)) return null;
+
+    for (const group of texts[lang].voteGroups) {
+      if (day >= group.range[0] && day <= group.range[1]) return group.options;
+    }
+    return null;
+  }
+
+  // Проверка голосования в localStorage
+  function hasVoted() {
+    // ключ: "vote_<date>_<lang>"
+    const day = getTodayDayNumber();
+    return localStorage.getItem(`vote_${day}_${lang}`) !== null;
+  }
+
+  // Сохранить голос в localStorage
+  function saveVote(option) {
+    const day = getTodayDayNumber();
+    localStorage.setItem(`vote_${day}_${lang}`, option);
+  }
+
+  // Загрузить все голоса с localStorage (просто для демонстрации)
+  // В реальности будет сложно собрать голоса от всех устройств, так что это пример!
+  // Здесь просто считаем сколько раз кто голосовал на этом устройстве.
+  // Можно сделать просто счетчик по текущему клиенту.
+  function getVotesCount() {
+    // Возвращаем объект с подсчётом голосов пользователя (1 или 0)
+    // Для теста просто 1 за выбранный вариант
+    const day = getTodayDayNumber();
+    const vote = localStorage.getItem(`vote_${day}_${lang}`);
+    const options = getCurrentVoteGroup();
+    if (!options) return {};
+    const counts = {};
+    options.forEach(o => counts[o] = 0);
+    if (vote && counts.hasOwnProperty(vote)) counts[vote] = 1;
+    return counts;
+  }
+
+  // Обновить отображение вариантов голосования
+  function buildVotingSection() {
+    const options = getCurrentVoteGroup();
+    voteOptionsDiv.innerHTML = '';
+    resultsDiv.innerHTML = '';
+    voteMessageDiv.textContent = texts[lang].voteMessage;
+
+    if (!options) {
+      voteOptionsDiv.innerHTML = `<p><em>Голосования нет сегодня.</em></p>`;
+      voteBtn.disabled = true;
+      resetVotesBtn.style.display = 'none';
+      voteMessageDiv.textContent = '';
+      return;
+    }
+
+    // Создаём радио кнопки для вариантов
+    options.forEach((opt, i) => {
+      const label = document.createElement('label');
+      label.className = 'vote-option';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'voteOption';
+      input.value = opt;
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(opt));
+      voteOptionsDiv.appendChild(label);
+    });
+
+    // Если пользователь уже голосовал — блокируем кнопку и показываем сообщение
+    if (hasVoted()) {
+      voteBtn.disabled = true;
+      voteMessageDiv.textContent = texts[lang].voteAlready;
+      showResults();
+    } else {
+      voteBtn.disabled = false;
+      voteMessageDiv.textContent = texts[lang].voteMessage;
+    }
+
+    resetVotesBtn.style.display = 'inline-block';
+  }
+
+  // Показать результаты голосования (по данным localStorage)
+  function showResults() {
+    const counts = getVotesCount();
+    if (Object.keys(counts).length === 0) {
+      resultsDiv.textContent = '';
+      return;
+    }
+    let resultsText = texts[lang].resultsTitle + ': ';
+    const parts = [];
+    for (const [opt, cnt] of Object.entries(counts)) {
+      parts.push(`${opt}: ${cnt}`);
+    }
+    resultsDiv.textContent = parts.join(', ');
+  }
+
+  voteBtn.addEventListener('click', () => {
+    const selected = document.querySelector('input[name="voteOption"]:checked');
+    if (!selected) {
+      voteMessageDiv.textContent = texts[lang].voteChooseOption;
+      return;
+    }
+    if (hasVoted()) {
+      voteMessageDiv.textContent = texts[lang].voteAlready;
+      return;
+    }
+    saveVote(selected.value);
+    voteMessageDiv.textContent = texts[lang].voteThanks;
+    voteBtn.disabled = true;
+    showResults();
+  });
+
+  resetVotesBtn.addEventListener('click', () => {
+    // Удаляем голос пользователя только для теста
+    const day = getTodayDayNumber();
+    localStorage.removeItem(`vote_${day}_${lang}`);
+    voteMessageDiv.textContent = '';
+    buildVotingSection();
+  });
+
+  // Инициализация текста
+  updateTexts();
+<!-- Аудио -->
+<audio id="barkSound1" src="1.m4a" preload="auto"></audio>
+<audio id="barkSound2" src="2.m4a" preload="auto"></audio>
+<audio id="meowSound" src="3.m4a" preload="auto"></audio>
+
+<script>
+  const barkSound1 = document.getElementById('barkSound1');
+  const barkSound2 = document.getElementById('barkSound2');
+  const meowSound = document.getElementById('meowSound');
+
+  // Кнопка "Гав-гав!"
+  document.getElementById('barkBtn').addEventListener('click', () => {
+    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
+    sound.currentTime = 0;
+    sound.play();
+  });
+
+  // Кнопка "Мяу от Юкки"
+  document.getElementById('meowBtn').addEventListener('click', () => {
     meowSound.currentTime = 0;
     meowSound.play();
   });
-  musicToggle.addEventListener("click", () => {
-    if (bgMusic.paused) {
-      bgMusic.play();
-      musicToggle.textContent = "🔈";
-    } else {
-      bgMusic.pause();
-      musicToggle.textContent = "🔊";
-    }
-  });
 
-  // Прокрутка вверх
-  const toTopBtn = document.getElementById("toTopBtn");
-  window.addEventListener("scroll", () => {
-    if (window.scrollY > 100) toTopBtn.classList.add("show");
-    else toTopBtn.classList.remove("show");
-  });
-  toTopBtn.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  // Аватарка — гав-гав!
-  const yukkiAvatar = document.getElementById("yukkiAvatar");
-  yukkiAvatar.addEventListener("click", () => {
+  // === Аватар Юкки — гавкать при клике ===
+  const yukkiAvatar = document.getElementById('yukkiAvatar');
+  yukkiAvatar.addEventListener('click', () => {
     barkBtn.click();
   });
-
-  // --- Рисовалка ---
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
-
-  let drawing = false;
-  let currentStroke = null;
-  let strokes = [];
-  let undoneStrokes = [];
-
-  let color = colors[0];
-  let thickness = 4;
-
-  // Отрисовка цвета кнопок
-  const colorPalette = document.getElementById("colorPalette");
-  colors.forEach(c => {
-    const btn = document.createElement("span");
-    btn.className = "color-btn";
-    btn.style.backgroundColor = c;
-    btn.dataset.color = c;
-    colorPalette.appendChild(btn);
-  });
-
-  // Выделяем первый цвет по умолчанию
-  colorPalette.firstChild.classList.add("selected");
-
-  // Установка стиля кисти
-  function setStrokeStyle() {
-    ctx.strokeStyle = color;
-    ctx.lineWidth = thickness;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-  }
-
-  // Перерисовать все штрихи
-  function redraw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (const stroke of strokes) {
-      ctx.beginPath();
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.thickness;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      const pts = stroke.points;
-      if (pts.length > 0) ctx.moveTo(pts[0].x, pts[0].y);
-      for (let i = 1; i < pts.length; i++) {
-        ctx.lineTo(pts[i].x, pts[i].y);
-      }
-      ctx.stroke();
-    }
-  }
-
-  // События рисования
-  canvas.addEventListener("mousedown", e => {
-    drawing = true;
-    currentStroke = {
-      points: [{ x: e.offsetX, y: e.offsetY }],
-      color,
-      thickness
-    };
-    undoneStrokes = [];
-  });
-
-  canvas.addEventListener("mousemove", e => {
-    if (!drawing) return;
-    currentStroke.points.push({ x: e.offsetX, y: e.offsetY });
-    redraw();
-    // Рисуем текущий штрих поверх
-    ctx.beginPath();
-    ctx.strokeStyle = currentStroke.color;
-    ctx.lineWidth = currentStroke.thickness;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const pts = currentStroke.points;
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < pts.length; i++) {
-      ctx.lineTo(pts[i].x, pts[i].y);
-    }
-    ctx.stroke();
-  });
-
-  canvas.addEventListener("mouseup", e => {
-    if (!drawing) return;
-    drawing = false;
-    strokes.push(currentStroke);
-    currentStroke = null;
-    redraw();
-  });
-  // --- Touch-события для рисования на телефонах ---
-  canvas.addEventListener("touchstart", e => {
-    e.preventDefault(); // чтобы страница не скроллилась
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-    drawing = true;
-    currentStroke = {
-      points: [{ x, y }],
-      color,
-      thickness
-    };
-    undoneStrokes = [];
-  });
-
-  canvas.addEventListener("touchmove", e => {
-    if (!drawing) return;
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    const x = touch.clientX - rect.left;
-    const y = touch.clientY - rect.top;
-    currentStroke.points.push({ x, y });
-    redraw();
-
-    // Отрисовка текущей линии
-    ctx.beginPath();
-    ctx.strokeStyle = currentStroke.color;
-    ctx.lineWidth = currentStroke.thickness;
-    ctx.lineCap = "round";
-    ctx.lineJoin = "round";
-    const pts = currentStroke.points;
-    ctx.moveTo(pts[0].x, pts[0].y);
-    for (let i = 1; i < pts.length; i++) {
-      ctx.lineTo(pts[i].x, pts[i].y);
-    }
-    ctx.stroke();
-  });
-
-  canvas.addEventListener("touchend", e => {
-    if (!drawing) return;
-    drawing = false;
-    strokes.push(currentStroke);
-    currentStroke = null;
-    redraw();
-  });
-
-  canvas.addEventListener("mouseleave", e => {
-    if (drawing) {
-      drawing = false;
-      if (currentStroke) {
-        strokes.push(currentStroke);
-        currentStroke = null;
-        redraw();
-      }
-    }
-  });
-
-  // Цвета - выбор
-  colorPalette.querySelectorAll(".color-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      color = btn.dataset.color;
-      setStrokeStyle();
-      // Выделение
-      colorPalette.querySelectorAll(".color-btn").forEach(b => b.classList.remove("selected"));
-      btn.classList.add("selected");
-    });
-  });
-
-  // Толщина кисти
-  document.getElementById("thicknessSelect").addEventListener("change", e => {
-    thickness = +e.target.value;
-    setStrokeStyle();
-  });
-
-  // Undo
-  document.getElementById("undoBtn").addEventListener("click", () => {
-    if (strokes.length === 0) return;
-    undoneStrokes.push(strokes.pop());
-    redraw();
-  });
-  // Redo
-  document.getElementById("redoBtn").addEventListener("click", () => {
-    if (undoneStrokes.length === 0) return;
-    strokes.push(undoneStrokes.pop());
-    redraw();
-  });
-
-  // Инициализация при загрузке
-  setStrokeStyle();
-  updateTexts(languageSelector.value);
-
-  // Меняем язык
-  languageSelector.addEventListener("change", e => {
-    updateTexts(e.target.value);
-    factsBox.textContent = randomFact(e.target.value);
-  });
-
-  // Смена темы — (пример, просто меняет фон)
-  themeSelector.addEventListener("change", e => {
-    const val = e.target.value;
-    if (val === "day") {
-      document.body.style.background = "#ffe4e1";
-      document.body.style.color = "#333";
-    } else if (val === "night") {
-      document.body.style.background = "#1a1a2e";
-      document.body.style.color = "#ddd";
-    } else if (val === "pink") {
-      document.body.style.background = "#f8c8dc";
-      document.body.style.color = "#333";
-    }
-  });
 </script>
-
 </body>
 </html>
+
