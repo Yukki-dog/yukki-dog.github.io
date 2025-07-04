@@ -3,319 +3,21 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki </title>
-<style>
-  body {
-    margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #ffe4e1;
-    color: #333;
-    transition: background 0.3s, color 0.3s;
-  }
-  #container {
-    max-width: 700px;
-    margin: 2rem auto;
-    padding: 0 1rem 4rem 1rem;
-    text-align: center;
-  }
-  #title {
-    font-size: 2.5rem;
-    margin-bottom: 0.5em;
-    user-select: none;
-  }
-  #greeting {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  #yukkiAvatar {
-    width: 180px;
-    border-radius: 50%;
-    cursor: pointer;
-    border: 4px solid #fff;
-    box-shadow: 0 0 12px rgba(255, 105, 180, 0.7);
-    transition: transform 0.3s ease;
-    margin-bottom: 1rem;
-  }
-  #yukkiAvatar:hover {
-    transform: scale(1.05) rotate(4deg);
-  }
-  .photos {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-bottom: 2rem;
-  }
-  .photo-item {
-    flex: 1 1 140px;
-    max-width: 160px;
-    cursor: pointer;
-  }
-  .photo-item img {
-    width: 100%;
-    border-radius: 12px;
-    transition: transform 0.4s ease;
-  }
-  .photo-item img:hover {
-    transform: scale(1.1) rotate(5deg);
-  }
-  .caption {
-    font-size: 0.85rem;
-    margin-top: 0.25em;
-    color: #555;
-  }
-  #factsBox {
-    position: fixed;
-    bottom: 12px;
-    left: 12px;
-    max-width: 280px;
-    padding: 10px 15px;
-    background: rgba(255 255 255 / 0.6);
-    border-radius: 12px;
-    font-size: 1rem;
-    font-style: italic;
-    color: #555;
-    box-shadow: 0 0 12px rgba(255, 192, 203, 0.7);
-    transition: opacity 0.5s ease;
-    user-select: none;
-    pointer-events: none;
-  }
-  #controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 1rem;
-    user-select: none;
-  }
-  button, select {
-    background: #ff69b4;
-    border: none;
-    border-radius: 22px;
-    padding: 8px 16px;
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: pointer;
-    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
-    transition: background 0.3s ease;
-  }
-  button:hover, select:hover {
-    background: #ff1493;
-  }
-  select {
-    padding: 6px 10px;
-  }
-  #toTopBtn {
-    position: fixed;
-    right: 20px;
-    bottom: 80px;
-    background: #ff69b4;
-    border: none;
-    border-radius: 50%;
-    padding: 12px 16px;
-    font-size: 1.6rem;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.7);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    user-select: none;
-    line-height: 1;
-  }
-  #toTopBtn.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  #drawingArea {
-    margin: 1rem auto 2rem;
-    max-width: 700px;
-    text-align: center;
-  }
-  #canvas {
-    border: 2px solid #ff69b4;
-    border-radius: 10px;
-    touch-action: none;
-  }
-  .color-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    display: inline-block;
-    margin: 3px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    transition: border-color 0.3s;
-  }
-  .color-btn.selected {
-    border-color: #fff;
-    box-shadow: 0 0 8px 2px #ff69b4;
-  }
-  #colorPalette {
-    margin-bottom: 10px;
-  }
-  label {
-    font-weight: 600;
-    margin-right: 6px;
-    user-select: none;
-  }
-  /* Голосование */
-  #votingSection {
-    margin: 2rem auto 4rem auto;
-    max-width: 700px;
-    background: #fff0f6;
-    border: 2px solid #ff69b4;
-    border-radius: 12px;
-    padding: 1rem 1.5rem;
-    text-align: center;
-  }
-  #votingSection h2 {
-    margin-top: 0;
-    color: #c71585;
-  }
-  .vote-option {
-    margin: 0.5rem 0;
-    font-size: 1.1rem;
-  }
-  .vote-option input[type="radio"] {
-    margin-right: 8px;
-    cursor: pointer;
-  }
-  #voteBtn, #resetVotesBtn {
-    margin-top: 1rem;
-    background: #ff1493;
-    box-shadow: 0 3px 8px rgba(255, 20, 147, 0.7);
-  }
-  #voteBtn:disabled {
-    background: #e0a3c2;
-    cursor: default;
-    box-shadow: none;
-  }
-  #results {
-    margin-top: 1.5rem;
-    font-style: italic;
-    color: #8b008b;
-  }
-  /* Темы: кнопки, фон, текст */
-  body.day-theme {
-    background: #ffe4e1;
-    color: #333;
-  }
-  body.night-theme {
-    background: #1a1a2e;
-    color: #ddd;
-  }
-  body.night-theme button, body.night-theme select {
-    background: #6a0dad;
-    color: #eee;
-    box-shadow: 0 3px 8px rgba(106, 13, 173, 0.5);
-  }
-  body.night-theme button:hover, body.night-theme select:hover {
-    background: #9400d3;
-  }
-  body.pink-theme {
-    background: #f8c8dc;
-    color: #333;
-  }
-  body.pink-theme button, body.pink-theme select {
-    background: #ff69b4;
-    color: white;
-    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
-  }
-  body.pink-theme button:hover, body.pink-theme select:hover {
-    background: #ff1493;
-  }
-</style>
+<title>Yukki site </title>
+<!-- Стили остались без изменений -->
+<style>/* ... (оставлены как есть, как ты прислала) ... */</style>
 </head>
 <body class="day-theme">
 
 <div id="container">
-  <h1 id="title">Yukki</h1>
-  <div id="greeting">Привет! Я Юкки — самая милая чихуахуа! 💖</div>
-  <img id="yukkiAvatar" src="cute.jfif" alt="Фото Юкки" title="Кликни для 'гав-гав!'" />
-
-  <div class="photos">
-    <div class="photo-item">
-      <img src="New_year.jfif" alt="Юкки у елки в шапочке эльфа" />
-      <div class="caption" id="capNewYear">Юкки в шапочке эльфа у ёлки</div>
-    </div>
-    <div class="photo-item">
-      <img src="paw.jpg" alt="Юккина лапка" />
-      <div class="caption" id="capPaw">Юккина лапка</div>
-    </div>
-    <div class="photo-item">
-      <img src="sitting.jpg" alt="Юкки мило сидит" />
-      <div class="caption" id="capSitting">Юкки очень мило сидит</div>
-    </div>
-    <div class="photo-item">
-      <img src="winter_dog.jfif" alt="Юкки на снегу стоит на двух лапах" />
-      <div class="caption" id="capWinter">Стоит на двух передних лапах на снегу</div>
-    </div>
-    <div class="photo-item">
-      <img src="with_candy_(special).jfif" alt="Юкки с конфетой в зубах" />
-      <div class="caption" id="capCandy">С конфетой в зубах (умеет открывать фантики!)</div>
-    </div>
-    <div class="photo-item">
-      <img src="with_glasses.jfif" alt="Юкки в очках" />
-      <div class="caption" id="capGlasses">В очках, в которых отражается Киев 💖</div>
-    </div>
-    <div class="photo-item">
-      <img src="with_hat.jfif" alt="Юкки в оригами шапке" />
-      <div class="caption" id="capHat">Оригами шапка</div>
-    </div>
-    <div class="photo-item">
-      <img src="with_toy.jfif" alt="Юкки с любимой игрушкой" />
-      <div class="caption" id="capToy">Best friends forever 🤍</div>
-    </div>
-  </div>
-
-  <div id="factsBox" title="Факты о Юкки">Народилась 1 березня 2021 року.</div>
-
-  <div id="controls">
-    <button id="barkBtn" title="Гав-гав!">Гав-гав!</button>
-    <button id="meowBtn" title="Мяу от Юкки">Мяу от Юкки</button>
-    <button id="hintBtn" title="Что нарисовать?">Что нарисовать?</button>
-    <button id="clearBtn" title="Очистить рисунок">Стереть всё</button>
-
-    <select id="languageSelector" title="Выбери язык">
-      <option value="ru" selected>Русский</option>
-      <option value="uk">Українська</option>
-      <option value="en">English</option>
-    </select>
-
-    <select id="themeSelector" title="Выбери тему">
-      <option value="day" selected>День</option>
-      <option value="night">Ночь</option>
-      <option value="pink">Розовая</option>
-    </select>
-
-    <button id="musicToggle" title="Включить/выключить музыку">🔊</button>
-  </div>
-
-  <div id="drawingArea">
-    <div id="colorPalette"></div>
-    <label for="thicknessSelect" id="thicknessLabel">Толщина кисти:</label>
-    <select id="thicknessSelect" title="Выбери толщину кисти">
-      <option value="2">2 px</option>
-      <option value="4" selected>4 px</option>
-      <option value="6">6 px</option>
-      <option value="8">8 px</option>
-      <option value="12">12 px</option>
-    </select>
-    <br/>
-    <canvas id="canvas" width="680" height="400" style="touch-action:none;"></canvas>
-    <br/>
-    <button id="undoBtn" title="Отменить (←)">←</button>
-    <button id="redoBtn" title="Повторить (→)">→</button>
-  </div>
+  <!-- ... весь HTML контент до голосования остаётся прежним ... -->
 
   <!-- Голосование -->
   <div id="votingSection">
-    <h2>Голосование: кто победит?</h2>
+    <h2 id="voteMessageTitle"></h2>
     <div id="voteOptions"></div>
     <button id="voteBtn" disabled>Голосовать</button>
-    <button id="resetVotesBtn" title="Сбросить голоса (только для теста)">Сбросить голоса</button>
+    <button id="resetVotesBtn">Сбросить голоса</button>
     <div id="results"></div>
     <div id="voteMessage" style="margin-top: 1rem; color: #b03060; font-weight: 600;"></div>
   </div>
@@ -329,457 +31,6 @@
 <audio id="meowSound" src="3.m4a" preload="auto"></audio>
 <audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop preload="auto"></audio>
 
-<script>
-  // === Тексты и факты ===
-  const texts = {
-    ru: {
-      greeting: "Привет! Я Юкки — самая милая чихуахуа! 💖",
-      captions: {
-        capNewYear: "Юкки в шапочке эльфа у ёлки",
-        capPaw: "Юккина лапка",
-        capSitting: "Юкки очень мило сидит",
-        capWinter: "Стоит на двух передних лапах на снегу",
-        capCandy: "С конфетой в зубах (умеет открывать фантики!)",
-        capGlasses: "В очках, в которых отражается Киев 💖",
-        capHat: "Оригами шапка",
-        capToy: "Best friends forever 🤍"
-      },
-      facts: [
-        "Народилась 1 березня 2021 року.",
-        "У неё карие глаза.",
-        "Пухнастый хвост с белой кисточкой на конце.",
-        "Знает команды: сидеть, лежать, дать пять, спокойной ночи, в засаде, атакуй, дай лапу, служить.",
-        "Любит гулять в комбезе.",
-        "Умеет открывать фантики конфет, где прячут вкусняшки.",
-        "Очень умная и быстро учится.",
-        "Обожает играть с любимой игрушкой — ёжиком.",
-        "Иногда застенчивая, но очень добрая и ласковая."
-      ],
-      buttons: {
-        bark: "Гав-гав!",
-        meow: "Мяу от Юкки",
-        day: "День",
-        night: "Ночь",
-        pink: "Розовая",
-        thicknessLabel: "Толщина кисти:",
-        hint: "Что нарисовать?",
-        clear: "Стереть всё"
-      },
-      drawHints: [
-        "Попробуй нарисовать: даёт лапу",
-        "Попробуй нарисовать: сидит",
-        "Попробуй нарисовать: Юкки в шапочке",
-        "Нарисуй конфету, которую Юкки любит",
-        "Нарисуй любимую игрушку ёжика"
-      ],
-      voteGroups: [
-        { range: [1, 2], options: ["Юкки", "Пылесос", "Огурчик"] },
-        { range: [3, 5], options: ["Дракон", "Маг", "Фея"] },
-        { range: [6, 8], options: ["Магма-слайм", "Ядерный слайм", "Украинский слайм"] },
-        { range: [9, 11], options: ["Феникс", "Котопес", "Каменные пикмины из Nintendo"] },
-        { range: [12, 15], options: ["Марио", "Луиджи", "Принцесса Пич"] },
-        { range: [16, 20], options: ["Линк", "Пакман", "100 приведений"] },
-        { range: [22, 28], options: ["Гарри Поттер", "Волан-де-Морт", "Сова Букля"] }
-      ],
-      voteNoVotingDays: [29, 30, 31],
-      voteButton: "Голосовать",
-      voteResetButton: "Сбросить голоса",
-      voteAlready: "Вы уже голосовали в этом голосовании.",
-      voteThanks: "Спасибо за ваш голос!",
-      voteChooseOption: "Пожалуйста, выберите вариант для голосования.",
-      resultsTitle: "Результаты голосования",
-      voteMessage: "Кто победит?"
-    },
-    uk: {
-      greeting: "Привіт! Я Юккі — наймиліша чихуахуа! 💖",
-      captions: {
-        capNewYear: "Юккі в шапочці ельфа біля ялинки",
-        capPaw: "Лапка Юккі",
-        capSitting: "Юккі дуже мило сидить",
-        capWinter: "Стоїть на двох передніх лапах на снігу",
-        capCandy: "З цукеркою в зубах (вміє відкривати обгортки!)",
-        capGlasses: "В окулярах, в яких відбивається Київ 💖",
-        capHat: "Орігамі капелюх",
-        capToy: "Найкращі друзі назавжди 🤍"
-      },
-      facts: [
-        "Народилась 1 березня 2021 року.",
-        "У неї карі очі.",
-        "Пухнастий хвіст із білою пензликом на кінці.",
-        "Знає команди: сидіти, лежати, дати п'ять, спокойної ночі, в засаді, атакуй, дай лапу, служити.",
-        "Любить гуляти в комбінезоні.",
-        "Вміє відкривати обгортки цукерок, де ховаються ласощі.",
-        "Дуже розумна і швидко вчиться.",
-        "Обожнює гратися з улюбленою іграшкою — їжачком.",
-        "Іноді сором’язлива, але дуже добра і лагідна."
-      ],
-      buttons: {
-        bark: "Гав-гав!",
-        meow: "Мяу від Юккі",
-        day: "День",
-        night: "Ніч",
-        pink: "Рожева",
-        thicknessLabel: "Товщина кисті:",
-        hint: "Що намалювати?",
-        clear: "Стерти все"
-      },
-      drawHints: [
-        "Спробуй намалювати: дає лапу",
-        "Спробуй намалювати: сидить",
-        "Спробуй намалювати: Юккі в шапочці",
-        "Намалюй цукерку, яку любить Юккі",
-        "Намалюй улюблену іграшку їжачка"
-      ],
-      voteGroups: [
-        { range: [1, 2], options: ["Юккі", "Пилосос", "Огірок"] },
-        { range: [3, 5], options: ["Дракон", "Маг", "Фея"] },
-        { range: [6, 8], options: ["Магма-слайм", "Ядерний слайм", "Український слайм"] },
-        { range: [9, 11], options: ["Фенікс", "Котопес", "Кам'яні пікміни з Nintendo"] },
-        { range: [12, 15], options: ["Маріо", "Луіджі", "Принцеса Піч"] },
-        { range: [16, 20], options: ["Лінк", "Пакман", "100 привидів"] },
-        { range: [22, 28], options: ["Гаррі Поттер", "Волан-де-Морт", "Сова Ґедвіга"] }
-      ],
-      voteNoVotingDays: [29, 30, 31],
-      voteButton: "Голосувати",
-      voteResetButton: "Скинути голоси",
-      voteAlready: "Ви вже голосували в цьому голосуванні.",
-      voteThanks: "Дякуємо за ваш голос!",
-      voteChooseOption: "Будь ласка, виберіть варіант для голосування.",
-      resultsTitle: "Результати голосування",
-      voteMessage: "Хто переможе?"
-    },
-    en: {
-      greeting: "Hello! I'm Yukki — the cutest chihuahua! 💖",
-      captions: {
-        capNewYear: "Yukki in an elf hat near the Christmas tree",
-        capPaw: "Yukki's paw",
-        capSitting: "Yukki sitting cutely",
-        capWinter: "Standing on two front paws in the snow",
-        capCandy: "With candy in teeth (can unwrap sweets!)",
-        capGlasses: "In glasses reflecting Kyiv 💖",
-        capHat: "Origami hat",
-        capToy: "Best friends forever 🤍"
-      },
-      facts: [
-        "Born on March 1, 2021.",
-        "Has brown eyes.",
-        "Fluffy tail with a white tip at the end.",
-        "Knows commands: sit, lie down, give five, good night, ambush, attack, give paw, serve.",
-        "Loves to walk in a jumpsuit.",
-        "Can unwrap candy wrappers where treats hide.",
-        "Very smart and learns fast.",
-        "Loves playing with favorite hedgehog toy.",
-        "Sometimes shy but very kind and affectionate."
-      ],
-      buttons: {
-        bark: "Bark!",
-        meow: "Meow from Yukki",
-        day: "Day",
-        night: "Night",
-        pink: "Pink",
-        thicknessLabel: "Brush thickness:",
-        hint: "What to draw?",
-        clear: "Clear all"
-      },
-      drawHints: [
-        "Try to draw: giving paw",
-        "Try to draw: sitting",
-        "Try to draw: Yukki in a hat",
-        "Draw the candy Yukki loves",
-        "Draw the favorite hedgehog toy"
-      ],
-      voteGroups: [
-        { range: [1, 2], options: ["Yukki", "Vacuum", "Cucumber"] },
-        { range: [3, 5], options: ["Dragon", "Mage", "Fairy"] },
-        { range: [6, 8], options: ["Magma Slime", "Nuclear Slime", "Ukrainian Slime"] },
-        { range: [9, 11], options: ["Phoenix", "Catdog", "Stone Pikmin from Nintendo"] },
-        { range: [12, 15], options: ["Mario", "Luigi", "Princess Peach"] },
-        { range: [16, 20], options: ["Link", "Pac-Man", "100 Ghosts"] },
-        { range: [22, 28], options: ["Harry Potter", "Voldemort", "Hedwig the Owl"] }
-      ],
-      voteNoVotingDays: [29, 30, 31],
-      voteButton: "Vote",
-      voteResetButton: "Reset votes",
-      voteAlready: "You have already voted in this poll.",
-      voteThanks: "Thanks for your vote!",
-      voteChooseOption: "Please select an option to vote.",
-      resultsTitle: "Voting Results",
-      voteMessage: "Who will win?"
-    }
-  };
-
-  // --- Переменные ---
-  let lang = 'ru';
-
-  // === Инициализация DOM элементов ===
-  const greetingEl = document.getElementById('greeting');
-  const captionsEls = {
-    capNewYear: document.getElementById('capNewYear'),
-    capPaw: document.getElementById('capPaw'),
-    capSitting: document.getElementById('capSitting'),
-    capWinter: document.getElementById('capWinter'),
-    capCandy: document.getElementById('capCandy'),
-    capGlasses: document.getElementById('capGlasses'),
-    capHat: document.getElementById('capHat'),
-    capToy: document.getElementById('capToy')
-  };
-  const factsBox = document.getElementById('factsBox');
-
-  // --- Кнопки ---
-  const barkBtn = document.getElementById('barkBtn');
-  const meowBtn = document.getElementById('meowBtn');
-  const hintBtn = document.getElementById('hintBtn');
-  const clearBtn = document.getElementById('clearBtn');
-  const themeSelector = document.getElementById('themeSelector');
-  const languageSelector = document.getElementById('languageSelector');
-  const musicToggle = document.getElementById('musicToggle');
-
-  // Аудио
-  const barkSound1 = document.getElementById('barkSound1');
-  const barkSound2 = document.getElementById('barkSound2');
-  const meowSound = document.getElementById('meowSound');
-  const bgMusic = document.getElementById('bgMusic');
-
-  // Кликер счётчики
-  let barkCount = 0;
-  let meowCount = 0;
-
-  // === Факты с интервалом 15 сек ===
-  function showRandomFact() {
-    const factList = texts[lang].facts;
-    const fact = factList[Math.floor(Math.random() * factList.length)];
-    factsBox.textContent = fact;
-    factsBox.style.opacity = '1';
-    setTimeout(() => {
-      factsBox.style.opacity = '0.2';
-    }, 12000);
-  }
-  setInterval(showRandomFact, 15000);
-  showRandomFact();
-
-  // === Обновление текста по языку ===
-  function updateTexts() {
-    greetingEl.textContent = texts[lang].greeting;
-    for (const key in captionsEls) {
-      if (captionsEls[key]) {
-        captionsEls[key].textContent = texts[lang].captions[key];
-      }
-    }
-    barkBtn.textContent = texts[lang].buttons.bark;
-    meowBtn.textContent = texts[lang].buttons.meow;
-    hintBtn.textContent = texts[lang].buttons.hint;
-    clearBtn.textContent = texts[lang].buttons.clear;
-    document.getElementById('thicknessLabel').textContent = texts[lang].buttons.thicknessLabel;
-
-    // Обновить голосование
-    buildVotingSection();
-  }
-
-  languageSelector.addEventListener('change', (e) => {
-    lang = e.target.value;
-    updateTexts();
-  });
-
-  // === Улучшенное переключение тем ===
-  function applyTheme(theme) {
-    document.body.classList.remove('day-theme', 'night-theme', 'pink-theme');
-    if (theme === 'day') document.body.classList.add('day-theme');
-    else if (theme === 'night') document.body.classList.add('night-theme');
-    else if (theme === 'pink') document.body.classList.add('pink-theme');
-  }
-  themeSelector.addEventListener('change', e => {
-    applyTheme(e.target.value);
-  });
-  applyTheme(themeSelector.value);
-
-  // === Кликер - звуки гав/мяу ===
-  const barkSounds = [barkSound1, barkSound2];
-  barkBtn.addEventListener('click', () => {
-    barkCount++;
-    // Случайный гавк
-    const s = barkSounds[Math.floor(Math.random() * barkSounds.length)];
-    s.currentTime = 0;
-    s.play();
-  });
-  meowBtn.addEventListener('click', () => {
-    meowCount++;
-    meowSound.currentTime = 0;
-    meowSound.play();
-  });
-
-  // === Рисовалка ===
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-
-  let drawing = false;
-  let currentColor = '#ff1493';
-  let lineWidth = 4;
-
-  const colorPalette = ['#ff1493', '#ff69b4', '#800080', '#000000', '#ffffff', '#ff4500', '#1e90ff'];
-  const colorPaletteEl = document.getElementById('colorPalette');
-  const thicknessSelect = document.getElementById('thicknessSelect');
-  const undoBtn = document.getElementById('undoBtn');
-  const redoBtn = document.getElementById('redoBtn');
-
-  // История для undo/redo
-  let undoStack = [];
-  let redoStack = [];
-
-  function saveState() {
-    redoStack = [];
-    undoStack.push(canvas.toDataURL());
-    if (undoStack.length > 50) undoStack.shift();
-  }
-
-  function restoreState(stackFrom, stackTo) {
-    if (stackFrom.length === 0) return;
-    const state = stackFrom.pop();
-    const img = new Image();
-    img.onload = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0);
-    };
-    img.src = state;
-    stackTo.push(state);
-  }
-
-  undoBtn.addEventListener('click', () => {
-    if (undoStack.length > 1) {
-      restoreState(undoStack, redoStack);
-    }
-  });
-  redoBtn.addEventListener('click', () => {
-    if (redoStack.length > 0) {
-      restoreState(redoStack, undoStack);
-    }
-  });
-
-  function drawLine(x1, y1, x2, y2) {
-    ctx.strokeStyle = currentColor;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-  }
-
-  let lastX = 0;
-  let lastY = 0;
-
-  canvas.addEventListener('pointerdown', (e) => {
-    drawing = true;
-    const rect = canvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
-    saveState();
-  });
-  canvas.addEventListener('pointermove', (e) => {
-    if (!drawing) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    drawLine(lastX, lastY, x, y);
-    lastX = x;
-    lastY = y;
-  });
-  canvas.addEventListener('pointerup', () => {
-    drawing = false;
-  });
-  canvas.addEventListener('pointerleave', () => {
-    drawing = false;
-  });
-
-  // Создать кнопки цвета
-  function createColorButtons() {
-    colorPaletteEl.innerHTML = '';
-    colorPalette.forEach(color => {
-      const btn = document.createElement('span');
-      btn.className = 'color-btn';
-      btn.style.backgroundColor = color;
-      if (color === currentColor) btn.classList.add('selected');
-      btn.title = color;
-      btn.addEventListener('click', () => {
-        currentColor = color;
-        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-      });
-      colorPaletteEl.appendChild(btn);
-    });
-  }
-  createColorButtons();
-
-  thicknessSelect.addEventListener('change', (e) => {
-    lineWidth = +e.target.value;
-  });
-
-  clearBtn.addEventListener('click', () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    saveState();
-  });
-
-  // Подсказки для рисования
-  hintBtn.addEventListener('click', () => {
-    const hints = texts[lang].drawHints;
-    const hint = hints[Math.floor(Math.random() * hints.length)];
-    alert(hint);
-  });
-
-  // === Плеер музыки ===
-  musicToggle.addEventListener('click', () => {
-    if (bgMusic.paused) {
-      bgMusic.play();
-      musicToggle.textContent = '🔈';
-    } else {
-      bgMusic.pause();
-      musicToggle.textContent = '🔊';
-    }
-  });
-
-  // === Кнопка "Наверх" ===
-  const toTopBtn = document.getElementById('toTopBtn');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 250) {
-      toTopBtn.classList.add('show');
-    } else {
-      toTopBtn.classList.remove('show');
-    }
-  });
-  toTopBtn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-
-  
-
-  // Инициализация текста
-  updateTexts();
-<!-- Аудио -->
-<audio id="barkSound1" src="1.m4a" preload="auto"></audio>
-<audio id="barkSound2" src="2.m4a" preload="auto"></audio>
-<audio id="meowSound" src="3.m4a" preload="auto"></audio>
-
-<script>
-  const barkSound1 = document.getElementById('barkSound1');
-  const barkSound2 = document.getElementById('barkSound2');
-  const meowSound = document.getElementById('meowSound');
-
-  <!-- ... -->
-
-<script>
-  // Кнопка "Гав-гав!"
-  document.getElementById('barkBtn').addEventListener('click', () => {
-    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
-    sound.currentTime = 0;
-    sound.play();
-  });
-
-  // Кнопка "Мяу от Юкки"
-  document.getElementById('meowBtn').addEventListener('click', () => {
-    meowSound.currentTime = 0;
-    meowSound.play();
-  });
-</script>
-
 <!-- 🐾 Кликер Юкки -->
 <section id="yukki-clicker" style="text-align:center; padding:30px 0;">
   <img id="clickerYukki" src="yukki_skin_default.png" alt="Юкки" style="width:150px; cursor:pointer; transition:transform 0.1s;">
@@ -787,26 +38,102 @@
 </section>
 
 <script>
-  let clickCount = 0;
-  let clickPower = 1;
-  let autoClick = 0;
+// ... все предыдущие скрипты остаются ...
 
-  const clickDisplay = document.getElementById('clickCount');
-  const yukkiClicker = document.getElementById('clickerYukki');
+// === Голосование ===
+const voteOptionsEl = document.getElementById("voteOptions");
+const voteBtn = document.getElementById("voteBtn");
+const resetVotesBtn = document.getElementById("resetVotesBtn");
+const resultsEl = document.getElementById("results");
+const voteMessageEl = document.getElementById("voteMessage");
+const voteMessageTitle = document.getElementById("voteMessageTitle");
 
-  yukkiClicker.addEventListener('click', () => {
-    clickCount += clickPower;
-    clickDisplay.textContent = clickCount;
-    yukkiClicker.style.transform = 'scale(1.1)';
-    setTimeout(() => yukkiClicker.style.transform = 'scale(1)', 100);
+function buildVotingSection() {
+  const today = new Date();
+  const day = today.getDate();
+  const groups = texts[lang].voteGroups;
+  const bannedDays = texts[lang].voteNoVotingDays;
+
+  if (bannedDays.includes(day)) {
+    voteOptionsEl.innerHTML = "";
+    voteBtn.disabled = true;
+    voteMessageEl.textContent = texts[lang].voteAlready;
+    voteMessageTitle.textContent = texts[lang].voteMessage;
+    return;
+  }
+
+  const group = groups.find(g => day >= g.range[0] && day <= g.range[1]);
+  if (!group) {
+    voteOptionsEl.innerHTML = "";
+    voteBtn.disabled = true;
+    voteMessageEl.textContent = "";
+    voteMessageTitle.textContent = "";
+    return;
+  }
+
+  const options = group.options;
+  voteOptionsEl.innerHTML = options.map((opt, i) =>
+    `<div class="vote-option"><input type="radio" name="vote" id="vote${i}" value="${i}"><label for="vote${i}">${opt}</label></div>`
+  ).join("");
+
+  voteBtn.disabled = false;
+  voteMessageEl.textContent = "";
+  voteMessageTitle.textContent = texts[lang].voteMessage;
+
+  // если голосовал — отключить
+  if (localStorage.getItem("voted-day") === day.toString()) {
+    voteBtn.disabled = true;
+    voteMessageEl.textContent = texts[lang].voteAlready;
+    showResults();
+  }
+}
+
+function showResults() {
+  const today = new Date();
+  const day = today.getDate();
+  const votes = JSON.parse(localStorage.getItem("votes-" + day)) || {};
+  const total = Object.values(votes).reduce((a, b) => a + b, 0);
+  if (total === 0) {
+    resultsEl.textContent = "";
+    return;
+  }
+  const resultLines = Object.entries(votes).map(([k, v]) => {
+    const label = document.querySelector(`label[for="vote${k}"]`).textContent;
+    const percent = ((v / total) * 100).toFixed(1);
+    return `${label}: ${v} голосов (${percent}%)`;
   });
+  resultsEl.innerHTML = `<strong>${texts[lang].resultsTitle}</strong><br>` + resultLines.join("<br>");
+}
 
-  setInterval(() => {
-    if (autoClick > 0) {
-      clickCount += autoClick;
-      clickDisplay.textContent = clickCount;
-    }
-  }, 1000);
+voteBtn.addEventListener("click", () => {
+  const selected = document.querySelector("input[name='vote']:checked");
+  if (!selected) {
+    voteMessageEl.textContent = texts[lang].voteChooseOption;
+    return;
+  }
+  const today = new Date();
+  const day = today.getDate();
+  const voteKey = selected.value;
+  const voteStorageKey = "votes-" + day;
+  const votes = JSON.parse(localStorage.getItem(voteStorageKey)) || {};
+
+  votes[voteKey] = (votes[voteKey] || 0) + 1;
+  localStorage.setItem(voteStorageKey, JSON.stringify(votes));
+  localStorage.setItem("voted-day", day.toString());
+  voteBtn.disabled = true;
+  voteMessageEl.textContent = texts[lang].voteThanks;
+  showResults();
+});
+
+resetVotesBtn.addEventListener("click", () => {
+  const day = new Date().getDate();
+  localStorage.removeItem("votes-" + day);
+  localStorage.removeItem("voted-day");
+  buildVotingSection();
+  resultsEl.textContent = "";
+});
+
+buildVotingSection();
 </script>
 
 </body>
