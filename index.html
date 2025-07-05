@@ -3,138 +3,455 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Yukki-dog</title>
-<!-- Стили остались без изменений -->
-<style>/* ... (оставлены как есть, как ты прислала) ... */</style>
+<title>Yukki — самая милая чихуахуа</title>
+<style>
+  body {
+    margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffe4e1;
+    color: #333;
+    transition: background 0.3s, color 0.3s;
+    cursor: url('default_cursor.png'), auto; /* начальный курсор */
+  }
+  #container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 0 1rem 4rem 1rem;
+    text-align: center;
+  }
+  #title {
+    font-size: 2.5rem;
+    margin-bottom: 0.5em;
+    user-select: none;
+  }
+  #greeting {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  #yukkiAvatar {
+    width: 180px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 4px solid #fff;
+    box-shadow: 0 0 12px rgba(255, 105, 180, 0.7);
+    transition: transform 0.3s ease;
+    margin-bottom: 1rem;
+  }
+  #yukkiAvatar:hover {
+    transform: scale(1.05) rotate(4deg);
+  }
+  .photos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .photo-item {
+    flex: 1 1 140px;
+    max-width: 160px;
+    cursor: pointer;
+  }
+  .photo-item img {
+    width: 100%;
+    border-radius: 12px;
+    transition: transform 0.4s ease;
+  }
+  .photo-item img:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+  .caption {
+    font-size: 0.85rem;
+    margin-top: 0.25em;
+    color: #555;
+  }
+  #factsBox {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    max-width: 280px;
+    padding: 10px 15px;
+    background: rgba(255 255 255 / 0.6);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-style: italic;
+    color: #555;
+    box-shadow: 0 0 12px rgba(255, 192, 203, 0.7);
+    transition: opacity 0.5s ease;
+    user-select: none;
+    pointer-events: none;
+  }
+  #controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    user-select: none;
+  }
+  button, select {
+    background: #ff69b4;
+    border: none;
+    border-radius: 22px;
+    padding: 8px 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(255, 105, 180, 0.5);
+    transition: background 0.3s ease;
+  }
+  button:hover, select:hover {
+    background: #ff1493;
+  }
+  select {
+    padding: 6px 10px;
+  }
+  #toTopBtn {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    background: #ff69b4;
+    border: none;
+    border-radius: 50%;
+    padding: 12px 16px;
+    font-size: 1.6rem;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 105, 180, 0.7);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+    user-select: none;
+    line-height: 1;
+  }
+  #toTopBtn.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #drawingArea {
+    margin: 1rem auto 2rem;
+    max-width: 700px;
+    text-align: center;
+  }
+  #canvas {
+    border: 2px solid #ff69b4;
+    border-radius: 10px;
+    touch-action: none;
+  }
+  .color-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+    margin: 3px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: border-color 0.3s;
+  }
+  .color-btn.selected {
+    border-color: #fff;
+    box-shadow: 0 0 8px 2px #ff69b4;
+  }
+  #colorPalette {
+    margin-bottom: 10px;
+  }
+  label {
+    font-weight: 600;
+    margin-right: 6px;
+    user-select: none;
+  }
+</style>
 </head>
-<body class="day-theme">
-
+<body>
 <div id="container">
-  <!-- ... весь HTML контент до голосования остаётся прежним ... -->
-
-  <!-- Голосование -->
-  <div id="votingSection">
-    <h2 id="voteMessageTitle"></h2>
-    <div id="voteOptions"></div>
-    <button id="voteBtn" disabled>Голосовать</button>
-    <button id="resetVotesBtn">Сбросить голоса</button>
-    <div id="results"></div>
-    <div id="voteMessage" style="margin-top: 1rem; color: #b03060; font-weight: 600;"></div>
+  <h1 id="title">Yukki — самая милая чихуахуа</h1>
+  <p id="greeting">Привет! Познакомься с Юкки.</p>
+  <img id="yukkiAvatar" src="yukki_avatar.png" alt="Юкки" />
+  
+  <div class="photos">
+    <div class="photo-item">
+      <img src="photo1.jpg" alt="Юкки на прогулке" />
+      <div class="caption">Юкки на прогулке</div>
+    </div>
+    <div class="photo-item">
+      <img src="photo2.jpg" alt="Юкки дома" />
+      <div class="caption">Юкки дома</div>
+    </div>
+    <div class="photo-item">
+      <img src="photo3.jpg" alt="Юкки спит" />
+      <div class="caption">Юкки спит</div>
+    </div>
   </div>
 
-  <button id="toTopBtn" title="Наверх">🠕</button>
+  <div id="drawingArea">
+    <div id="colorPalette"></div>
+    <label for="thicknessSelect">Толщина линии:</label>
+    <select id="thicknessSelect">
+      <option value="2">2</option>
+      <option value="4" selected>4</option>
+      <option value="6">6</option>
+      <option value="8">8</option>
+    </select>
+    <button id="undoBtn">Отменить</button>
+    <button id="redoBtn">Повторить</button>
+    <button id="clearBtn">Очистить</button>
+    <button id="hintBtn">Подсказка для рисования</button>
+    <br/>
+    <canvas id="canvas" width="600" height="400"></canvas>
+  </div>
+
+  <div id="factsBox">
+    Здесь будут интересные факты о Юкки
+  </div>
+
+  <div id="controls">
+    <button id="barkBtn">Гав-гав!</button>
+    <button id="meowBtn">Мяу от Юкки</button>
+    <button id="musicToggle">🔊 Вкл/Выкл музыку</button>
+  </div>
+
+  <section id="yukki-clicker" style="text-align:center; padding:30px 0;">
+    <img id="clickerYukki" src="yukki_skin_default.png" alt="Юкки" style="width:150px; cursor:pointer; transition:transform 0.1s;">
+    <div style="font-size:1.8em; margin-top:10px;">🍗 <span id="clickCount">0</span></div>
+  </section>
+
+  <button id="toTopBtn" title="Наверх">⬆</button>
 </div>
 
 <!-- Аудио -->
 <audio id="barkSound1" src="1.m4a" preload="auto"></audio>
 <audio id="barkSound2" src="2.m4a" preload="auto"></audio>
 <audio id="meowSound" src="3.m4a" preload="auto"></audio>
-<audio id="bgMusic" src="Cat_life_KotikMurKotikUA.mp3" loop preload="auto"></audio>
-
-<!-- 🐾 Кликер Юкки -->
-<section id="yukki-clicker" style="text-align:center; padding:30px 0;">
-  <img id="clickerYukki" src="yukki_skin_default.png" alt="Юкки" style="width:150px; cursor:pointer; transition:transform 0.1s;">
-  <div style="font-size:1.8em; margin-top:10px;">🍗 <span id="clickCount">0</span></div>
-</section>
 
 <script>
-// ... все предыдущие скрипты остаются ...
-
-// === Голосование ===
-const voteOptionsEl = document.getElementById("voteOptions");
-const voteBtn = document.getElementById("voteBtn");
-const resetVotesBtn = document.getElementById("resetVotesBtn");
-const resultsEl = document.getElementById("results");
-const voteMessageEl = document.getElementById("voteMessage");
-const voteMessageTitle = document.getElementById("voteMessageTitle");
-
-function buildVotingSection() {
-  const today = new Date();
-  const day = today.getDate();
-  const groups = texts[lang].voteGroups;
-  const bannedDays = texts[lang].voteNoVotingDays;
-
-  if (bannedDays.includes(day)) {
-    voteOptionsEl.innerHTML = "";
-    voteBtn.disabled = true;
-    voteMessageEl.textContent = texts[lang].voteAlready;
-    voteMessageTitle.textContent = texts[lang].voteMessage;
-    return;
+  // --- Смена курсора ---
+  // Функция смены курсора для всего body
+  function setCursor(cursorUrl) {
+    document.body.style.cursor = `url(${cursorUrl}), auto`;
   }
 
-  const group = groups.find(g => day >= g.range[0] && day <= g.range[1]);
-  if (!group) {
-    voteOptionsEl.innerHTML = "";
-    voteBtn.disabled = true;
-    voteMessageEl.textContent = "";
-    voteMessageTitle.textContent = "";
-    return;
-  }
-
-  const options = group.options;
-  voteOptionsEl.innerHTML = options.map((opt, i) =>
-    `<div class="vote-option"><input type="radio" name="vote" id="vote${i}" value="${i}"><label for="vote${i}">${opt}</label></div>`
-  ).join("");
-
-  voteBtn.disabled = false;
-  voteMessageEl.textContent = "";
-  voteMessageTitle.textContent = texts[lang].voteMessage;
-
-  // если голосовал — отключить
-  if (localStorage.getItem("voted-day") === day.toString()) {
-    voteBtn.disabled = true;
-    voteMessageEl.textContent = texts[lang].voteAlready;
-    showResults();
-  }
-}
-
-function showResults() {
-  const today = new Date();
-  const day = today.getDate();
-  const votes = JSON.parse(localStorage.getItem("votes-" + day)) || {};
-  const total = Object.values(votes).reduce((a, b) => a + b, 0);
-  if (total === 0) {
-    resultsEl.textContent = "";
-    return;
-  }
-  const resultLines = Object.entries(votes).map(([k, v]) => {
-    const label = document.querySelector(`label[for="vote${k}"]`).textContent;
-    const percent = ((v / total) * 100).toFixed(1);
-    return `${label}: ${v} голосов (${percent}%)`;
+  // Пример использования: меняем курсор при клике на аватар Юкки
+  const yukkiAvatar = document.getElementById('yukkiAvatar');
+  yukkiAvatar.addEventListener('click', () => {
+    barkBtn.click();
+    // Меняем курсор на курсор с собакой
+    setCursor('dog_cursor.png');
+    // Через 5 секунд возвращаем стандартный курсор
+    setTimeout(() => {
+      setCursor('default_cursor.png');
+    }, 5000);
   });
-  resultsEl.innerHTML = `<strong>${texts[lang].resultsTitle}</strong><br>` + resultLines.join("<br>");
-}
 
-voteBtn.addEventListener("click", () => {
-  const selected = document.querySelector("input[name='vote']:checked");
-  if (!selected) {
-    voteMessageEl.textContent = texts[lang].voteChooseOption;
-    return;
+  // --- Кликер ---
+  let clickCount = 0;
+  let clickPower = 1;
+  let autoClick = 0;
+
+  const clickDisplay = document.getElementById('clickCount');
+  const yukkiClicker = document.getElementById('clickerYukki');
+
+  yukkiClicker.addEventListener('click', () => {
+    clickCount += clickPower;
+    clickDisplay.textContent = clickCount;
+    yukkiClicker.style.transform = 'scale(1.1)';
+    setTimeout(() => yukkiClicker.style.transform = 'scale(1)', 100);
+  });
+
+  setInterval(() => {
+    if (autoClick > 0) {
+      clickCount += autoClick;
+      clickDisplay.textContent = clickCount;
+    }
+  }, 1000);
+
+  // --- Звуки гав/мяу ---
+  const barkSound1 = document.getElementById('barkSound1');
+  const barkSound2 = document.getElementById('barkSound2');
+  const meowSound = document.getElementById('meowSound');
+
+  const barkBtn = document.getElementById('barkBtn');
+  const meowBtn = document.getElementById('meowBtn');
+
+  barkBtn.addEventListener('click', () => {
+    const sound = Math.random() < 0.5 ? barkSound1 : barkSound2;
+    sound.currentTime = 0;
+    sound.play();
+  });
+
+  meowBtn.addEventListener('click', () => {
+    meowSound.currentTime = 0;
+    meowSound.play();
+  });
+
+  // --- Рисовалка ---
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let drawing = false;
+  let currentColor = '#ff1493';
+  let lineWidth = 4;
+
+  const colorPalette = ['#ff1493', '#ff69b4', '#800080', '#000000', '#ffffff', '#ff4500', '#1e90ff'];
+  const colorPaletteEl = document.getElementById('colorPalette');
+  const thicknessSelect = document.getElementById('thicknessSelect');
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const hintBtn = document.getElementById('hintBtn');
+
+  // История для undo/redo
+  let undoStack = [];
+  let redoStack = [];
+
+  function saveState() {
+    redoStack = [];
+    undoStack.push(canvas.toDataURL());
+    if (undoStack.length > 50) undoStack.shift();
   }
-  const today = new Date();
-  const day = today.getDate();
-  const voteKey = selected.value;
-  const voteStorageKey = "votes-" + day;
-  const votes = JSON.parse(localStorage.getItem(voteStorageKey)) || {};
 
-  votes[voteKey] = (votes[voteKey] || 0) + 1;
-  localStorage.setItem(voteStorageKey, JSON.stringify(votes));
-  localStorage.setItem("voted-day", day.toString());
-  voteBtn.disabled = true;
-  voteMessageEl.textContent = texts[lang].voteThanks;
-  showResults();
-});
+  function restoreState(stackFrom, stackTo) {
+    if (stackFrom.length === 0) return;
+    const state = stackFrom.pop();
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = state;
+    stackTo.push(state);
+  }
 
-resetVotesBtn.addEventListener("click", () => {
-  const day = new Date().getDate();
-  localStorage.removeItem("votes-" + day);
-  localStorage.removeItem("voted-day");
-  buildVotingSection();
-  resultsEl.textContent = "";
-});
+  undoBtn.addEventListener('click', () => {
+    if (undoStack.length > 1) {
+      restoreState(undoStack, redoStack);
+    }
+  });
 
-buildVotingSection();
+  redoBtn.addEventListener('click', () => {
+    if (redoStack.length > 0) {
+      restoreState(redoStack, undoStack);
+    }
+  });
+
+  function drawLine(x1, y1, x2, y2) {
+    ctx.strokeStyle = currentColor;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  let lastX = 0;
+  let lastY = 0;
+
+  canvas.addEventListener('pointerdown', (e) => {
+    drawing = true;
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+    saveState();
+  });
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    drawLine(lastX, lastY, x, y);
+    lastX = x;
+    lastY = y;
+  });
+
+  canvas.addEventListener('pointerup', () => {
+    drawing = false;
+  });
+
+  canvas.addEventListener('pointerleave', () => {
+    drawing = false;
+  });
+
+  // Создать кнопки цвета
+  function createColorButtons() {
+    colorPaletteEl.innerHTML = '';
+    colorPalette.forEach(color => {
+      const btn = document.createElement('span');
+      btn.className = 'color-btn';
+      btn.style.backgroundColor = color;
+      if (color === currentColor) btn.classList.add('selected');
+      btn.title = color;
+      btn.addEventListener('click', () => {
+        currentColor = color;
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+      });
+      colorPaletteEl.appendChild(btn);
+    });
+  }
+  createColorButtons();
+
+  thicknessSelect.addEventListener('change', (e) => {
+    lineWidth = +e.target.value;
+  });
+
+  clearBtn.addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    saveState();
+  });
+
+  // Подсказки для рисования (только те, что есть)
+  const texts = {
+    ru: {
+      drawHints: [
+        "Используй плавные линии.",
+        "Попробуй смешивать цвета.",
+        "Начни с простых форм.",
+        "Добавь тени для глубины."
+      ]
+    }
+  };
+  const lang = 'ru';
+
+  hintBtn.addEventListener('click', () => {
+    const hints = texts[lang].drawHints;
+    const hint = hints[Math.floor(Math.random() * hints.length)];
+    alert(hint);
+  });
+
+  // --- Плеер музыки ---
+  const musicToggle = document.getElementById('musicToggle');
+  const bgMusic = new Audio('background_music.mp3');
+  bgMusic.loop = true;
+  musicToggle.addEventListener('click', () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicToggle.textContent = '🔈';
+    } else {
+      bgMusic.pause();
+      musicToggle.textContent = '🔊';
+    }
+  });
+
+  // --- Кнопка "Наверх" ---
+  const toTopBtn = document.getElementById('toTopBtn');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 250) {
+      toTopBtn.classList.add('show');
+    } else {
+      toTopBtn.classList.remove('show');
+    }
+  });
+  toTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // --- Аватар Юкки — гавкать при клике ---
+  yukkiAvatar.addEventListener('click', () => {
+    barkBtn.click();
+  });
+
 </script>
-
 </body>
 </html>
